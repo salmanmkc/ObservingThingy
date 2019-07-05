@@ -54,7 +54,7 @@ namespace ObservingThingy.Services
         private async Task UpdateLastStateEntry(HostsDataRepository hostsrepo, CancellationToken stoppingToken)
         {
             var ping = new Ping();
-            var hosts = await hostsrepo.GetAllWithStates();
+            var hosts = await hostsrepo.GetAllActiveWithStates();
 
             foreach (var host in hosts)
             {
@@ -100,7 +100,7 @@ namespace ObservingThingy.Services
 
         private async Task CreateStateEntries(HostsDataRepository hostsrepo)
         {
-            var hosts = await hostsrepo.GetAllWithStates();
+            var hosts = await hostsrepo.GetAllActiveWithStates();
 
             foreach (var host in hosts)
                 host.States.Add(new HostState { Host = host });

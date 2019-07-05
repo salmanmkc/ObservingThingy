@@ -26,10 +26,11 @@ namespace ObservingThingy.Data
                     .ToListAsync();
         }
 
-        internal async Task<List<Host>> GetAllWithStates()
+        internal async Task<List<Host>> GetAllActiveWithStates()
         {
             using (var context = _factory())
                 return await context.Hosts
+                    .Where(x => x.IsValid)
                     .Include(x => x.States)
                     .ToListAsync();
         }
