@@ -73,26 +73,40 @@ namespace ObservingThingy.Services
                     {
                         case IPStatus.Success:
                             state.Delay = (int)reply.RoundtripTime;
+                            switch (reply.RoundtripTime)
+                            {
+                                case long n when n < 70:
+                                    state.Status = HostState.StatusEnum.Online;
+                                    break;
+                                case long n when n < 300:
+                                    state.Status = HostState.StatusEnum.Warning;
+                                    break;
+                                case long n when n < 2000:
+                                    state.Status = HostState.StatusEnum.Critical;
+                                    break;
+                                default:
+                                    state.Status = HostState.StatusEnum.Error;
+                                    break;
+                            }
                             break;
 
                         case IPStatus.TimedOut:
-                            state.IsTimeout = true;
+                            state.Status = HostState.StatusEnum.Offline;
                             break;
 
                         default:
                             _logger.LogError($"Unknown IPStatus {reply.Status} while checking {host.Hostname}");
-                            state.IsError = true;
+                            state.Status = HostState.StatusEnum.Error;
                             break;
                     }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"Error while checking {host.Name} ({host.Hostname})");
-                    state.IsError = true;
+                    state.Status = HostState.StatusEnum.Error;
                 }
                 finally
                 {
-                    state.IsChecked = true;
                     await hostsrepo.Update(host);
                 }
             }

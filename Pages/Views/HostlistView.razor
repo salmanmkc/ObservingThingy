@@ -52,7 +52,7 @@
                         <div class="pingsegments">
                             @foreach (var state in @host.States.TakeLast(10))
                             {
-                                <div class="pingsegment" title="@state.Delay"></div>
+                                <div class="pingsegment @state.Status" title="@state.Delay"></div>
                             }
                         </div>
                     </td>

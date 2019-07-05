@@ -24,8 +24,16 @@ namespace ObservingThingy.Data
 
         public int Delay { get; set; } = 0;
 
-        public bool IsChecked { get; set; } = false;
-        public bool IsTimeout { get; set; } = false;
-        public bool IsError { get; set; } = false;
+        public StatusEnum Status { get; set; } = StatusEnum.Unchecked;
+
+        public enum StatusEnum : int
+        {
+            Unchecked = 0,
+            Online,
+            Warning,
+            Critical,
+            Offline,
+            Error
+        }
     }
 }
