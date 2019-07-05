@@ -75,8 +75,10 @@ namespace ObservingThingy.Services
         private async Task CreateStateEntries()
         {
             var hosts = await _repo.GetAllWithStates();
+
             foreach (var host in hosts)
                 host.States.Add(new HostState { Host = host });
+
             await _repo.Update(hosts);
         }
     }
