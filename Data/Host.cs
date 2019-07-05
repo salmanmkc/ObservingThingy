@@ -22,6 +22,10 @@ namespace ObservingThingy.Data
 
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.Now;
 
-        public int Delay { get; set; }
+        public int Delay { get; set; } = 0;
+
+        public bool IsChecked { get; set; } = false;
+        public bool IsTimeout { get; set; } = false;
+        public bool IsError { get; set; } = false;
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ObservingThingy.Data;
+using ObservingThingy.Services;
 
 namespace ObservingThingy
 {
@@ -36,7 +37,9 @@ namespace ObservingThingy
             services.AddDbContextFactory<ApplicationDbContext>(builder => builder
                 .UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<DataRepository>();
+            services.AddScoped<HostsDataRepository>();
+
+            services.AddHostedService<HostRefreshService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
