@@ -69,7 +69,21 @@ namespace ObservingThingy.Services
                 {
                     var reply = await ping.SendPingAsync(host.Hostname, 2000);
 
-                    state.Delay = (int)reply.RoundtripTime;
+                    switch (reply.Status)
+                    {
+                        case IPStatus.Success:
+                            state.Delay = (int)reply.RoundtripTime;
+                            break;
+
+                        case IPStatus.TimedOut:
+                            state.IsTimeout = true;
+                            break;
+
+                        default:
+                            _logger.LogError($"Unknown IPStatus {reply.Status} while checking {host.Hostname}");
+                            state.IsError = true;
+                            break;
+                    }
                 }
                 catch (Exception ex)
                 {
