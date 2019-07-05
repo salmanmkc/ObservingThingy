@@ -11,6 +11,7 @@ namespace ObservingThingy.Data
     {
         private readonly ILogger<HostsDataRepository> _logger;
         private readonly Func<ApplicationDbContext> _factory;
+        
 
         public HostsDataRepository(ILoggerFactory loggerfactory, Func<ApplicationDbContext> factory)
         {

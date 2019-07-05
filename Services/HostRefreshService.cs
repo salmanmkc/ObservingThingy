@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ObservingThingy.Data;
@@ -11,13 +12,13 @@ namespace ObservingThingy.Services
 {
     public class HostRefreshService : BackgroundService
     {
+        private readonly IServiceProvider _provider;
         private readonly ILogger<HostRefreshService> _logger;
-        private readonly HostsDataRepository _hostrepo;
 
-        public HostRefreshService(ILoggerFactory loggerfactory, HostsDataRepository hostrepo)
+        public HostRefreshService(IServiceProvider provider, ILoggerFactory loggerfactory)
         {
+            _provider = provider;
             _logger = loggerfactory.CreateLogger<HostRefreshService>();
-            _hostrepo = hostrepo;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,25 +27,34 @@ namespace ObservingThingy.Services
 
             while (!stoppingToken.IsCancellationRequested)
             {
+                _logger.LogInformation("Checking hosts started");
+
                 try
                 {
-                    await CreateStateEntries();
+                    using (var scope = _provider.CreateScope())
+                    {
+                        var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsDataRepository>();
 
-                    await UpdateLastStateEntry(stoppingToken);
+                        await CreateStateEntries(hostsrepo);
+
+                        await UpdateLastStateEntry(hostsrepo, stoppingToken);
+                    }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Fatal error occurred while checking status");
                 }
 
+                _logger.LogInformation("Checking hosts finished");
+
                 await Task.Delay(10000, stoppingToken);
             }
         }
 
-        private async Task UpdateLastStateEntry(CancellationToken stoppingToken)
+        private async Task UpdateLastStateEntry(HostsDataRepository hostsrepo, CancellationToken stoppingToken)
         {
             var ping = new Ping();
-            var hosts = await _hostrepo.GetAllWithStates();
+            var hosts = await hostsrepo.GetAllWithStates();
 
             foreach (var host in hosts)
             {
@@ -67,19 +77,19 @@ namespace ObservingThingy.Services
                 finally
                 {
                     state.IsChecked = true;
-                    await _hostrepo.Update(host);
+                    await hostsrepo.Update(host);
                 }
             }
         }
 
-        private async Task CreateStateEntries()
+        private async Task CreateStateEntries(HostsDataRepository hostsrepo)
         {
-            var hosts = await _hostrepo.GetAllWithStates();
+            var hosts = await hostsrepo.GetAllWithStates();
 
             foreach (var host in hosts)
                 host.States.Add(new HostState { Host = host });
 
-            await _hostrepo.Update(hosts);
+            await hostsrepo.Update(hosts);
         }
     }
 }
