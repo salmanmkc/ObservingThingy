@@ -30,7 +30,7 @@
                     <td class="right aligned">
                         <div class="ui disabled button">Edit</div>
                         <div class="ui disabled button">Disable</div>
-                        <div class="ui negative disabled button">Delete</div>
+                        <div class="ui negative button" @onclick="@(e => DeleteHost(@host))">Delete</div>
                     </td>
                 </tr>
             }
@@ -84,6 +84,16 @@
             await _hostsrepo.Create(host);
 
             _data = new NewHostDataModel();
+            await OnInitAsync();
+        }
+        catch (Exception ex) { }
+    }
+
+    protected async Task DeleteHost(Host host)
+    {
+        try
+        {
+            await _hostsrepo.Delete(host);
             await OnInitAsync();
         }
         catch (Exception ex) { }
