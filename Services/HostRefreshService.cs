@@ -12,12 +12,12 @@ namespace ObservingThingy.Services
     public class HostRefreshService : BackgroundService
     {
         private readonly ILogger<HostRefreshService> _logger;
-        private readonly HostsDataRepository _repo;
+        private readonly HostsDataRepository _hostrepo;
 
-        public HostRefreshService(ILoggerFactory loggerfactory, HostsDataRepository repo)
+        public HostRefreshService(ILoggerFactory loggerfactory, HostsDataRepository hostrepo)
         {
             _logger = loggerfactory.CreateLogger<HostRefreshService>();
-            _repo = repo;
+            _hostrepo = hostrepo;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -44,7 +44,7 @@ namespace ObservingThingy.Services
         private async Task UpdateLastStateEntry(CancellationToken stoppingToken)
         {
             var ping = new Ping();
-            var hosts = await _repo.GetAllWithStates();
+            var hosts = await _hostrepo.GetAllWithStates();
 
             foreach (var host in hosts)
             {
@@ -67,19 +67,19 @@ namespace ObservingThingy.Services
                 finally
                 {
                     state.IsChecked = true;
-                    await _repo.Update(host);
+                    await _hostrepo.Update(host);
                 }
             }
         }
 
         private async Task CreateStateEntries()
         {
-            var hosts = await _repo.GetAllWithStates();
+            var hosts = await _hostrepo.GetAllWithStates();
 
             foreach (var host in hosts)
                 host.States.Add(new HostState { Host = host });
 
-            await _repo.Update(hosts);
+            await _hostrepo.Update(hosts);
         }
     }
 }
