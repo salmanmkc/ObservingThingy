@@ -61,6 +61,8 @@ namespace ObservingThingy.Services
                 if (stoppingToken.IsCancellationRequested)
                     return;
 
+                _logger.LogInformation($"Checking host {host.Name} ({host.Hostname})");
+
                 var state = host.States.Last();
 
                 try

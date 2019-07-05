@@ -1,0 +1,98 @@
+@page "/config/hosts"
+
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+@using ObservingThingy.Data
+
+@inject HostsDataRepository _hostsrepo
+<div class="ui fluid basic segment container">
+
+    <h1>Hosts</h1>
+
+    <table class="ui table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Hostname</th>
+                <th>Comment</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var host in hosts)
+            {
+                <tr>
+                    <td class="collapsing">@host.Id</td>
+                    <td class="collapsing">@host.Name</td>
+                    <td class="collapsing">@host.Hostname</td>
+                    <td>@host.Comment</td>
+                    <td class="right aligned">
+                        <div class="ui disabled button">Edit</div>
+                        <div class="ui disabled button">Disable</div>
+                        <div class="ui negative disabled button">Delete</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <EditForm class="ui form" Model="@_data" OnValidSubmit="@AddNewHost">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="fields">
+
+            <div class="field">
+                <label for="">Name</label>
+                <input type="text" @bind="@_data.Name"/>
+            </div>
+
+            <div class="field">
+                <label for="">Hostname</label>
+                <input type="text" @bind="@_data.Hostname"/>
+            </div>
+
+        </div>
+
+        <button class="ui positive button" type="submit">Create</button>
+
+    </EditForm>
+</div>
+
+@code
+{
+    List<Host> hosts { get; set; }
+
+    NewHostDataModel _data { get; set; } = new NewHostDataModel();
+
+    protected override async Task OnInitAsync()
+    {
+        hosts = await _hostsrepo.GetAll();
+    }
+
+    protected async Task AddNewHost()
+    {
+        try
+        {
+            var host = new Host {
+                Name = _data.Name,
+                Hostname = _data.Hostname
+            };
+
+            await _hostsrepo.Create(host);
+
+            _data = new NewHostDataModel();
+            await OnInitAsync();
+        }
+        catch (Exception ex) { }
+    }
+
+    public class NewHostDataModel
+    {
+        public string Name { get; set; }
+        [Required]
+        public string Hostname { get; set; }
+    }
+}

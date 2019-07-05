@@ -11,12 +11,19 @@ namespace ObservingThingy.Data
     {
         private readonly ILogger<HostsDataRepository> _logger;
         private readonly Func<ApplicationDbContext> _factory;
-        
+
 
         public HostsDataRepository(ILoggerFactory loggerfactory, Func<ApplicationDbContext> factory)
         {
             _factory = factory;
             _logger = loggerfactory.CreateLogger<HostsDataRepository>();
+        }
+
+        internal async Task<List<Host>> GetAll()
+        {
+            using (var context = _factory())
+                return await context.Hosts
+                    .ToListAsync();
         }
 
         internal async Task<List<Host>> GetAllWithStates()

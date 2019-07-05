@@ -1,11 +1,36 @@
 ﻿@inherits LayoutComponentBase
 
+@inject IJSRuntime _js;
+
 <div class="ui attached inverted menu">
     <a href="" class="header item">ObservingThingy</a>
 
     <NavLink href="/" class="item" Match="NavLinkMatch.All">Home</NavLink>
+
+    <div class="ui disabled item">
+        Views
+    </div>
+
+    <div class="ui disabled item">
+        Profiles
+    </div>
+
+    <div class="ui dropdown item">
+        Config
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <NavLink href="/config/hosts" class="item" Match="NavLinkMatch.All">Hosts</NavLink>
+        </div>
+    </div>
 </div>
 
 <div class="ui fluid container">
     @Body
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync()
+    {
+        await _js.InvokeAsync<bool>("semanticApplyDropdown");
+    }
+}
