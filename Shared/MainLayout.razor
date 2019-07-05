@@ -5,10 +5,14 @@
 <div class="ui attached inverted menu">
     <a href="" class="header item">ObservingThingy</a>
 
-    <NavLink href="/" class="item" Match="NavLinkMatch.All">Home</NavLink>
+    <NavLink href="/" class="ui item" Match="NavLinkMatch.All">Home</NavLink>
 
-    <div class="ui disabled item">
-        Views
+    <div class="ui dropdown item">
+        Hostlists
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <NavLink href="/views" class="item" Match="NavLinkMatch.All">All</NavLink>
+        </div>
     </div>
 
     <div class="ui disabled item">

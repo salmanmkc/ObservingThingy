@@ -1,0 +1,79 @@
+@page "/views"
+@page "/views/{hostlistname}"
+
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+@using ObservingThingy.Data
+
+@inject HostsDataRepository _hostsrepo
+<div class="ui fluid basic segment container">
+
+    <h1>@hostlistname</h1>
+
+    <table class="ui table">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Name</th>
+                <th>Tags</th>
+                <th>Ping</th>
+                <th>Secondary Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var host in hosts)
+            {
+                <tr>
+                    <td>
+                        <div class="ui disabled basic icon button">
+                            <i class="cloud icon"></i>
+                        </div>
+                    </td>
+
+                    <td>
+                        <h2 class="ui sub header">
+                            @host.Hostname
+                        </h2>
+                        <span>
+                            @host.Name
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="ui green label">
+                            Online
+                            <i class="delete icon"></i>
+                        </div>
+                    </td>
+
+                    <td>
+                        @foreach (var state in @host.States)
+                        {
+                            <span>@state.Timestamp</span>
+                        }
+                    </td>
+
+                    <td>
+                        <div class="ui disabled icon button">
+                            <i class="cloud icon"></i>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@code
+{
+    [Parameter]
+    private string hostlistname { get; set; } = string.Empty;
+
+    List<Host> hosts { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        hosts = await _hostsrepo.GetAllActiveWithStates();
+    }
+}
