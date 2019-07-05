@@ -1,13 +1,26 @@
-body > .app.container {
+body>.app.container {
     display: grid;
     grid-template-rows: auto 1fr auto;
     grid-template-areas: "menu""content""footer";
 }
 
-.app.container > .ui.menu {
+.app.container>.ui.menu {
     grid-area: menu;
 }
 
-.app.container > .ui.container {
+.app.container>.ui.container {
     grid-area: content;
+}
+
+.pingsegment {
+    width: 3px;
+    height: 1.5em;
+    background-color: lightgray;
+    padding: 0;
+    margin: 0 1px 0 0;
+}
+
+.pingsegments {
+    display: inline-grid;
+    grid-auto-flow: column;
 }

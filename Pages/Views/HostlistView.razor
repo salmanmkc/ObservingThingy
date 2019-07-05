@@ -12,10 +12,10 @@
 
     <h1>@hostlistname</h1>
 
-    <table class="ui table">
+    <table class="ui very basic very compact table">
         <thead>
             <tr>
-                <th>Action</th>
+                <th>Actions</th>
                 <th>Name</th>
                 <th>Tags</th>
                 <th>Ping</th>
@@ -26,13 +26,13 @@
             @foreach (var host in hosts)
             {
                 <tr>
-                    <td>
+                    <td class="collapsing">
                         <div class="ui disabled basic icon button">
                             <i class="cloud icon"></i>
                         </div>
                     </td>
 
-                    <td>
+                    <td class="collapsing">
                         <h2 class="ui sub header">
                             @host.Hostname
                         </h2>
@@ -48,16 +48,18 @@
                         </div>
                     </td>
 
-                    <td>
-                        @foreach (var state in @host.States)
-                        {
-                            <span>@state.Timestamp</span>
-                        }
+                    <td class="right aligned collapsing">
+                        <div class="pingsegments">
+                            @foreach (var state in @host.States.TakeLast(10))
+                            {
+                                <div class="pingsegment" title="@state.Delay"></div>
+                            }
+                        </div>
                     </td>
 
-                    <td>
-                        <div class="ui disabled icon button">
-                            <i class="cloud icon"></i>
+                    <td class="right aligned collapsing">
+                        <div class="ui disabled button">
+                            Connect
                         </div>
                     </td>
                 </tr>
