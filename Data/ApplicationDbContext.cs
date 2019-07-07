@@ -9,16 +9,21 @@ namespace ObservingThingy.Data
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
+            : base(options) { }
 
         public DbSet<Host> Hosts { get; set; }
+        public DbSet<HostList> HostLists { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<ApplicationEvent> Events { get; set; }
         public DbSet<Rule> Rules { get; set; }
         public DbSet<AppAction> Actions { get; set; }
         public DbSet<Tag> Tags { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<HostListToHost>()
+                .HasKey(x => new { x.HostListId, x.HostId });
+        }
     }
 
     public class AppAction : DataModel

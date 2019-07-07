@@ -91,4 +91,16 @@ namespace ObservingThingy.Data
             }
         }
     }
+    public class HostListsDataRepository
+    {
+        private readonly Func<ApplicationDbContext> _factory;
+        private readonly ILogger<HostListsDataRepository> _logger;
+
+        public HostListsDataRepository(ILoggerFactory loggerfactory, Func<ApplicationDbContext> factory)
+        {
+            _factory = factory;
+            _logger = loggerfactory.CreateLogger<HostListsDataRepository>();
+        }
+
+    }
 }
