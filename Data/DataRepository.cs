@@ -102,5 +102,39 @@ namespace ObservingThingy.Data
             _logger = loggerfactory.CreateLogger<HostListsDataRepository>();
         }
 
+        internal async Task<List<HostList>> GetAll()
+        {
+            using (var context = _factory())
+                return await context.HostLists
+                    .Include(x => x.HostListToHosts)
+                    .ToListAsync();
+        }
+
+        internal async Task Create(HostList hostlist)
+        {
+            using (var context = _factory())
+            {
+                await context.HostLists.AddAsync(hostlist);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task Update(HostList hostlist)
+        {
+            using (var context = _factory())
+            {
+                context.HostLists.Update(hostlist);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task Delete(HostList hostlist)
+        {
+            using (var context = _factory())
+            {
+                context.HostLists.Remove(hostlist);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

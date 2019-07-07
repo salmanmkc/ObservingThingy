@@ -38,6 +38,7 @@ namespace ObservingThingy
                 .UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<HostsDataRepository>();
+            services.AddScoped<HostListsDataRepository>();
 
             services.AddHostedService<HostRefreshService>();
         }
