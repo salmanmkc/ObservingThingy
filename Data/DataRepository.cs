@@ -35,6 +35,18 @@ namespace ObservingThingy.Data
                     .ToListAsync();
         }
 
+        internal async Task<List<Host>> GetAllActiveWithStates(int hostlistid)
+        {
+            using (var context = _factory())
+                return await context.Set<HostListToHost>()
+                    .Include(x => x.Host)
+                    .ThenInclude(x => x.States)
+                    .Where(x => x.HostListId == hostlistid)
+                    .Where(x => x.Host.IsValid)
+                    .Select(x => x.Host)
+                    .ToListAsync();
+        }
+
         internal async Task<Host> GetById(int id)
         {
             using (var context = _factory())

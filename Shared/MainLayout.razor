@@ -1,5 +1,9 @@
 ﻿@inherits LayoutComponentBase
 
+@using ObservingThingy.Data
+
+@* @inject HostsDataRepository _hostsrepo *@
+@inject HostListsDataRepository _hostlistsrepo
 @inject IJSRuntime _js;
 
 <div class="ui attached inverted menu">
@@ -11,7 +15,12 @@
         Hostlists
         <i class="dropdown icon"></i>
         <div class="menu">
-            <NavLink href="/views" class="item" Match="NavLinkMatch.All">All</NavLink>
+            <a href="/views/0" class="item">All</a>
+            <div class="divider"></div>
+            @foreach (var hostlist in hostlists)
+            {
+                <a href="/views/@hostlist.Id" class="item">@hostlist.Name</a>
+            }
         </div>
     </div>
 
@@ -34,6 +43,14 @@
 </div>
 
 @code {
+
+    List<HostList> hostlists { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        hostlists = await _hostlistsrepo.GetAll();
+    }
+
     protected override async Task OnAfterRenderAsync()
     {
         await _js.InvokeAsync<bool>("semanticApplyDropdown");

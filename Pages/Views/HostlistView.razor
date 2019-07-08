@@ -1,5 +1,5 @@
 @page "/views"
-@page "/views/{hostlistname}"
+@page "/views/{id:int}"
 
 @using System.Collections.Generic
 @using System.ComponentModel.DataAnnotations
@@ -8,9 +8,11 @@
 @implements IDisposable
 
 @inject HostsDataRepository _hostsrepo
+@inject HostListsDataRepository _hostlistsrepo
+
 <div class="ui fluid basic segment container">
 
-    <h1>@hostlistname</h1>
+    <!-- <h1>Hosts</h1> -->
 
     <table class="ui very basic very compact table">
         <thead>
@@ -72,7 +74,7 @@
 @code
 {
     [Parameter]
-    private string hostlistname { get; set; } = string.Empty;
+    private int id { get; set; }
 
     List<Host> hosts { get; set; }
 
@@ -80,8 +82,14 @@
 
     protected override async Task OnInitAsync()
     {
-        hosts = await _hostsrepo.GetAllActiveWithStates();
+        await RefreshHosts();
+
         RefreshLoop();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshHosts();
     }
 
     private async Task RefreshLoop()
@@ -89,9 +97,17 @@
         while (active)
         {
             await Task.Delay(3000); // 3 seconds
-            hosts = await _hostsrepo.GetAllActiveWithStates();
+            await RefreshHosts();
             StateHasChanged();
         }
+    }
+
+    private async Task RefreshHosts()
+    {
+        if (id == 0)
+            hosts = await _hostsrepo.GetAllActiveWithStates();
+        else
+            hosts = await _hostsrepo.GetAllActiveWithStates(id);
     }
 
     public void Dispose()
