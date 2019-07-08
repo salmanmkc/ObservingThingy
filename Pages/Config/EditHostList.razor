@@ -1,0 +1,90 @@
+@page "/config/hostlists/{id:int}"
+
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+@using ObservingThingy.Data
+
+@inject HostsDataRepository _hostsrepo
+@inject HostListsDataRepository _hostlistsrepo
+
+<div class="ui fluid basic segment container">
+
+    <h1>Edit Host List - @hostlist.Name</h1>
+
+    <table class="ui table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Hostname</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var host in hosts)
+            {
+                <tr>
+                    <td class="collapsing">@host.Id</td>
+                    <td class="collapsing">@host.Name</td>
+                    <td>@host.Hostname</td>
+                    <td class="right aligned">
+                        <div class="ui icon buttons">
+                            <div class="ui disabled button"><i class="chevron down icon"></i></div>
+                            <div class="ui disabled button"><i class="chevron up icon"></i></div>
+                        </div>
+                        <div class="ui negative button" @onclick="@(e => RemoveHostFromHostList(@host))">Remove</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="ui search dropdown button">
+        <div class="text">Add Host...</div>
+        <i class="dropdown icon"></i>
+
+        <div class="menu">
+            @foreach (var host in allhosts){
+                <div class="item" @onclick="@(e => AddHostToHostList(@host))">@host.Hostname</div>
+            }
+        </div>
+
+    </div>
+
+</div>
+
+@code
+{
+    [Parameter]
+    int id { get; set; }
+
+    HostList hostlist { get; set; }
+    List<Host> hosts { get; set; }
+    List<Host> allhosts { get; set; }
+
+
+    protected override async Task OnInitAsync()
+    {
+        hostlist = await _hostlistsrepo.Get(id);
+        hosts = await _hostlistsrepo.GetHosts(id);
+        allhosts = await _hostsrepo.GetAll();
+    }
+
+    async Task AddHostToHostList(Host host)
+    {
+        try
+        {
+            await _hostlistsrepo.AddHostToHostList(host, hostlist);
+        } catch (Exception ex) { }
+        await OnInitAsync();
+    }
+
+    async Task RemoveHostFromHostList(Host host)
+    {
+        try
+        {
+            await _hostlistsrepo.RemoveHostFromHostList(host, hostlist);
+        } catch (Exception ex) { }
+        await OnInitAsync();
+    }
+}

@@ -28,7 +28,7 @@
                     <td class="collapsing">@hostlist.Name</td>
                     <td>@hostlist.HostListToHosts.Count</td>
                     <td class="right aligned">
-                        <div class="ui disabled button">Edit</div>
+                        <a class="ui button" href="/config/hostlists/@hostlist.Id">Edit</a>
                         @if(@hostlist.IsValid)
                         {
                             <div class="ui button" @onclick="@(e => ToggleActiveState(@hostlist))">Disable</div>
