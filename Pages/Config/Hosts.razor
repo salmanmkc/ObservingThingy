@@ -79,7 +79,9 @@
     {
         try
         {
-            var newhosts = _data.Hostname.GetLines().Select(x=>new Host{Hostname=x});
+            var newhosts = _data.Hostname
+                .GetLines()
+                .Select(x => new Host { Hostname = x.Trim() });
 
             await _hostsrepo.Create(newhosts);
 
