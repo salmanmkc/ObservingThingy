@@ -42,6 +42,7 @@ namespace ObservingThingy
             services.AddScoped<HostListsRepository>();
 
             services.AddHostedService<HostRefreshService>();
+            services.AddHostedService<CleanupService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

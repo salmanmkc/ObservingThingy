@@ -64,7 +64,7 @@ namespace ObservingThingy.Services
 
                 _logger.LogInformation($"Checking host {host.Name} ({host.Hostname})");
 
-                var state = host.States.Last();
+                var state = await hostsrepo.GetLastHostState(host.Id);
 
                 try
                 {
@@ -108,7 +108,7 @@ namespace ObservingThingy.Services
                 }
                 finally
                 {
-                    await hostsrepo.Update(host);
+                    await hostsrepo.UpdateHostState(state);
                 }
             }
         }
@@ -118,9 +118,7 @@ namespace ObservingThingy.Services
             var hosts = await hostsrepo.GetAllActiveWithStates();
 
             foreach (var host in hosts)
-                host.States.Add(new HostState { Host = host });
-
-            await hostsrepo.Update(hosts);
+                await hostsrepo.AddHostState(new HostState { HostId = host.Id });
         }
     }
 }

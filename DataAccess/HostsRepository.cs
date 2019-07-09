@@ -27,6 +27,14 @@ namespace ObservingThingy.DataAccess
                     .ToListAsync();
         }
 
+        internal async Task<List<Host>> GetAllWithStates()
+        {
+            using (var context = _factory())
+                return await context.Hosts
+                    .Include(x => x.States)
+                    .ToListAsync();
+        }
+
         internal async Task<List<Host>> GetAllActiveWithStates()
         {
             using (var context = _factory())
@@ -100,15 +108,42 @@ namespace ObservingThingy.DataAccess
             }
         }
 
-        internal async Task AddHostState(int hostid, HostState state)
+        internal async Task<HostState> GetLastHostState(int hostid)
+        {
+            using (var context = _factory())
+                return await context.Set<HostState>()
+                    .Where(x => x.HostId == hostid)
+                    .OrderByDescending(x => x.Timestamp)
+                    .FirstAsync();
+
+        }
+
+        internal async Task AddHostState(HostState state)
         {
             using (var context = _factory())
             {
-                var host = await context.Hosts
-                    .Include(x => x.States)
-                    .SingleAsync(x => x.Id == hostid);
-                host.States.Add(state);
-                context.Update(host);
+                await context.Set<HostState>()
+                    .AddAsync(state);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task UpdateHostState(HostState state)
+        {
+            using (var context = _factory())
+            {
+                context.Set<HostState>()
+                    .Update(state);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task RemoveHostState(HostState state)
+        {
+            using (var context = _factory())
+            {
+                context.Set<HostState>()
+                    .Remove(state);
                 await context.SaveChangesAsync();
             }
         }
