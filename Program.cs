@@ -44,7 +44,9 @@ namespace ObservingThingy
             Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder
+                        .UseStartup<Startup>()
+                        .UseUrls("http://localhost:5000", "http://*:5000");
                 });
     }
 }
