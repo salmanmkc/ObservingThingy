@@ -26,6 +26,8 @@ namespace ObservingThingy.Services
         {
             _logger.LogInformation($"Service {nameof(HostRefreshService)} started");
 
+            var looptimestamp = DateTimeOffset.Now;
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Checking hosts started");
@@ -47,6 +49,9 @@ namespace ObservingThingy.Services
                 }
 
                 _logger.LogInformation("Checking hosts finished");
+
+                _logger.LogInformation($"Loop timer {DateTimeOffset.Now - looptimestamp}");
+                looptimestamp = DateTimeOffset.Now;
 
                 await Task.Delay(10000, stoppingToken);
             }
