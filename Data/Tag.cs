@@ -22,4 +22,12 @@ namespace ObservingThingy.Data
     {
         none = 0, red, orange, yellow, olive, green, teal, blue, violet, purple, pink, brown, grey, black, primary, secondary
     }
+
+    public class TagToHost
+    {
+        public Tag Tag { get; set; }
+        public int TagId { get; set; }
+        public Host Host { get; set; }
+        public int HostId { get; set; }
+    }
 }
