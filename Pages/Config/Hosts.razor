@@ -52,13 +52,8 @@
         <div class="fields">
 
             <div class="field">
-                <label for="">Name</label>
-                <input type="text" @bind="@_data.Name"/>
-            </div>
-
-            <div class="field">
                 <label for="">Hostname</label>
-                <input type="text" @bind="@_data.Hostname"/>
+                <textarea @bind="@_data.Hostname" cols="20" rows="6"></textarea>
             </div>
 
         </div>
@@ -83,12 +78,9 @@
     {
         try
         {
-            var host = new Host {
-                Name = _data.Name,
-                Hostname = _data.Hostname
-            };
+            var newhosts = _data.Hostname.GetLines().Select(x=>new Host{Hostname=x});
 
-            await _hostsrepo.Create(host);
+            await _hostsrepo.Create(newhosts);
 
             _data = new NewHostDataModel();
             await OnInitAsync();

@@ -63,6 +63,15 @@ namespace ObservingThingy.Data
             }
         }
 
+        internal async Task Create(IEnumerable<Host> hosts)
+        {
+            using (var context = _factory())
+            {
+                await context.Hosts.AddRangeAsync(hosts);
+                await context.SaveChangesAsync();
+            }
+        }
+
         internal async Task Update(Host host)
         {
             using (var context = _factory())
