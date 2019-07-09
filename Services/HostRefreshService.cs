@@ -53,7 +53,7 @@ namespace ObservingThingy.Services
                 _logger.LogInformation($"Loop timer {DateTimeOffset.Now - looptimestamp}");
                 looptimestamp = DateTimeOffset.Now;
 
-                await Task.Delay(10000, stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
         }
 
