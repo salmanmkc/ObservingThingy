@@ -54,62 +54,64 @@ namespace ObservingThingy.Services
 
         private async Task UpdateLastStateEntry(HostsRepository hostsrepo, CancellationToken stoppingToken)
         {
-            var ping = new Ping();
             var hosts = await hostsrepo.GetAllActiveWithStates();
 
-            foreach (var host in hosts)
+            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, x));
+
+            await Task.WhenAll(checks);
+        }
+
+        private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, Data.Host host)
+        {
+            _logger.LogInformation($"Checking host {host.Name} ({host.Hostname})");
+
+            var state = await hostsrepo.GetLastHostState(host.Id);
+
+            var ping = new Ping();
+
+            try
             {
-                if (stoppingToken.IsCancellationRequested)
-                    return;
+                var reply = await ping.SendPingAsync(host.Hostname, 2000);
 
-                _logger.LogInformation($"Checking host {host.Name} ({host.Hostname})");
-
-                var state = await hostsrepo.GetLastHostState(host.Id);
-
-                try
+                switch (reply.Status)
                 {
-                    var reply = await ping.SendPingAsync(host.Hostname, 2000);
+                    case IPStatus.Success:
+                        state.Delay = (int)reply.RoundtripTime;
+                        switch (reply.RoundtripTime)
+                        {
+                            case long n when n < 70:
+                                state.Status = HostState.StatusEnum.Online;
+                                break;
+                            case long n when n < 300:
+                                state.Status = HostState.StatusEnum.Warning;
+                                break;
+                            case long n when n < 2000:
+                                state.Status = HostState.StatusEnum.Critical;
+                                break;
+                            default:
+                                state.Status = HostState.StatusEnum.Error;
+                                break;
+                        }
+                        break;
 
-                    switch (reply.Status)
-                    {
-                        case IPStatus.Success:
-                            state.Delay = (int)reply.RoundtripTime;
-                            switch (reply.RoundtripTime)
-                            {
-                                case long n when n < 70:
-                                    state.Status = HostState.StatusEnum.Online;
-                                    break;
-                                case long n when n < 300:
-                                    state.Status = HostState.StatusEnum.Warning;
-                                    break;
-                                case long n when n < 2000:
-                                    state.Status = HostState.StatusEnum.Critical;
-                                    break;
-                                default:
-                                    state.Status = HostState.StatusEnum.Error;
-                                    break;
-                            }
-                            break;
+                    case IPStatus.TimedOut:
+                        state.Status = HostState.StatusEnum.Offline;
+                        break;
 
-                        case IPStatus.TimedOut:
-                            state.Status = HostState.StatusEnum.Offline;
-                            break;
-
-                        default:
-                            _logger.LogError($"Unknown IPStatus {reply.Status} while checking {host.Hostname}");
-                            state.Status = HostState.StatusEnum.Error;
-                            break;
-                    }
+                    default:
+                        _logger.LogError($"Unknown IPStatus {reply.Status} while checking {host.Hostname}");
+                        state.Status = HostState.StatusEnum.Error;
+                        break;
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"Error while checking {host.Name} ({host.Hostname})");
-                    state.Status = HostState.StatusEnum.Error;
-                }
-                finally
-                {
-                    await hostsrepo.UpdateHostState(state);
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while checking {host.Name} ({host.Hostname})");
+                state.Status = HostState.StatusEnum.Error;
+            }
+            finally
+            {
+                await hostsrepo.UpdateHostState(state);
             }
         }
 
