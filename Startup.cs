@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ObservingThingy.Data;
+using ObservingThingy.DataAccess;
 using ObservingThingy.Services;
 
 namespace ObservingThingy
@@ -37,8 +38,8 @@ namespace ObservingThingy
             services.AddDbContextFactory<ApplicationDbContext>(builder => builder
                 .UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<HostsDataRepository>();
-            services.AddScoped<HostListsDataRepository>();
+            services.AddScoped<HostsRepository>();
+            services.AddScoped<HostListsRepository>();
 
             services.AddHostedService<HostRefreshService>();
         }

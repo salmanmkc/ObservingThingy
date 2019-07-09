@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ObservingThingy.Data;
+using ObservingThingy.DataAccess;
 
 namespace ObservingThingy.Services
 {
@@ -33,7 +34,7 @@ namespace ObservingThingy.Services
                 {
                     using (var scope = _provider.CreateScope())
                     {
-                        var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsDataRepository>();
+                        var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
 
                         await CreateStateEntries(hostsrepo);
 
@@ -51,7 +52,7 @@ namespace ObservingThingy.Services
             }
         }
 
-        private async Task UpdateLastStateEntry(HostsDataRepository hostsrepo, CancellationToken stoppingToken)
+        private async Task UpdateLastStateEntry(HostsRepository hostsrepo, CancellationToken stoppingToken)
         {
             var ping = new Ping();
             var hosts = await hostsrepo.GetAllActiveWithStates();
@@ -112,7 +113,7 @@ namespace ObservingThingy.Services
             }
         }
 
-        private async Task CreateStateEntries(HostsDataRepository hostsrepo)
+        private async Task CreateStateEntries(HostsRepository hostsrepo)
         {
             var hosts = await hostsrepo.GetAllActiveWithStates();
 

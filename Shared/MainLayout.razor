@@ -1,9 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
 @using ObservingThingy.Data
+@using ObservingThingy.DataAccess
 
-@* @inject HostsDataRepository _hostsrepo *@
-@inject HostListsDataRepository _hostlistsrepo
+@* @inject HostsRepository _hostsrepo *@
+@inject HostListsRepository _hostlistsrepo
 @inject IJSRuntime _js;
 
 <div class="ui attached inverted menu">
