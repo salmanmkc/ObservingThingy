@@ -17,7 +17,7 @@ namespace ObservingThingy.Services
         private readonly IServiceProvider _provider;
         private readonly ILogger<CleanupService> _logger;
 
-        TimeSpan loopdelay = TimeSpan.FromMinutes(1); // TODO: Needs to be changed to something more sane
+        TimeSpan loopdelay = TimeSpan.FromMinutes(15); // TODO: Needs to be changed to something more sane
 
         public CleanupService(IServiceProvider provider, ILoggerFactory loggerfactory)
         {
@@ -37,7 +37,7 @@ namespace ObservingThingy.Services
                 {
                     using (var scope = _provider.CreateScope())
                     {
-                        var removebefore = DateTimeOffset.Now - TimeSpan.FromMinutes(15); // TODO: Needs to be changed to something more sane
+                        var removebefore = DateTimeOffset.Now - TimeSpan.FromHours(3); // TODO: Needs to be changed to something more sane
 
                         var repo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
 
