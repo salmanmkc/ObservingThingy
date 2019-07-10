@@ -60,5 +60,36 @@ namespace ObservingThingy.DataAccess
                 await context.SaveChangesAsync();
             }
         }
+
+        internal async Task<List<Tag>> GetTagsForHost(int hostid)
+        {
+            using (var context = _factory())
+                return await context.Set<TagToHost>()
+                    .Include(x => x.Tag)
+                    .Where(x => x.HostId == hostid)
+                    .Select(x => x.Tag)
+                    .ToListAsync();
+
+        }
+
+        internal async Task AddTagToHost(Tag tag, Host host)
+        {
+            using (var context = _factory())
+            {
+                await context.Set<TagToHost>()
+                    .AddAsync(new TagToHost { TagId = tag.Id, HostId = host.Id });
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task RemoveTagFromHost(Tag tag, Host host)
+        {
+            using (var context = _factory())
+            {
+                context.Set<TagToHost>()
+                    .Remove(new TagToHost { TagId = tag.Id, HostId = host.Id });
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

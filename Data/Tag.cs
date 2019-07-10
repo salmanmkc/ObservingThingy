@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ObservingThingy.Data
 {
@@ -7,6 +8,8 @@ namespace ObservingThingy.Data
         public TagColor Color { get; set; } = TagColor.none;
         public bool IsBasic { get; set; } = false;
         public bool IsInverted { get; set; } = false;
+
+        public List<TagToHost> TagToHosts { get; set; }
 
         public string GetCssClasses()
         {
@@ -25,9 +28,9 @@ namespace ObservingThingy.Data
 
     public class TagToHost
     {
-        public Tag Tag { get; set; }
         public int TagId { get; set; }
-        public Host Host { get; set; }
+        public Tag Tag { get; set; }
         public int HostId { get; set; }
+        public Host Host { get; set; }
     }
 }

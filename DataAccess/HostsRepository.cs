@@ -41,6 +41,8 @@ namespace ObservingThingy.DataAccess
                 return await context.Hosts
                     .Where(x => x.IsValid)
                     .Include(x => x.States)
+                    .Include(x => x.TagToHosts)
+                    .ThenInclude(x => x.Tag)
                     .ToListAsync();
         }
 
@@ -50,6 +52,9 @@ namespace ObservingThingy.DataAccess
                 return await context.Set<HostListToHost>()
                     .Include(x => x.Host)
                     .ThenInclude(x => x.States)
+                    .Include(x => x.Host)
+                    .ThenInclude(x => x.TagToHosts)
+                    .ThenInclude(x => x.Tag)
                     .Where(x => x.HostListId == hostlistid)
                     .Where(x => x.Host.IsValid)
                     .Select(x => x.Host)
@@ -124,6 +129,16 @@ namespace ObservingThingy.DataAccess
             {
                 await context.Set<HostState>()
                     .AddAsync(state);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task AddHostState(IEnumerable<HostState> state)
+        {
+            using (var context = _factory())
+            {
+                await context.Set<HostState>()
+                    .AddRangeAsync(state);
                 await context.SaveChangesAsync();
             }
         }

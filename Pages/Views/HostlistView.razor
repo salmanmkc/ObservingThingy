@@ -45,10 +45,13 @@
                     </td>
 
                     <td>
-                        <div class="ui green label">
-                            Online
-                            <i class="delete icon"></i>
-                        </div>
+                        @foreach (var link in host.TagToHosts)
+                        {
+                            <div class="ui @link.Tag.Color label">
+                                @link.Tag.Name
+                                <i class="delete icon"></i>
+                            </div>
+                        }
                     </td>
 
                     <td class="right aligned collapsing">

@@ -11,6 +11,7 @@ namespace ObservingThingy.Data
         public List<Service> Services { get; set; }
 
         public List<HostListToHost> HostListToHosts { get; set; }
+        public List<TagToHost> TagToHosts { get; set; }
 
         public string Comment { get; set; }
     }
