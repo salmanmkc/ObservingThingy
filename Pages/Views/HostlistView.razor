@@ -10,6 +10,7 @@
 
 @inject HostsRepository _hostsrepo
 @inject HostListsRepository _hostlistsrepo
+@inject TagsRepository _tagsrepo
 
 <div class="ui fluid basic segment container">
 
@@ -30,9 +31,12 @@
             {
                 <tr>
                     <td class="collapsing">
-                        <div class="ui disabled basic icon button">
-                            <i class="cloud icon"></i>
-                        </div>
+                        @foreach (var tag in tags)
+                        {
+                            <div class="ui basic icon button" @onclick="@(e => AddTagToHost(tag, host))">
+                                <i class="cloud icon"></i>
+                            </div>
+                        }
                     </td>
 
                     <td class="collapsing">
@@ -49,7 +53,7 @@
                         {
                             <div class="ui @link.Tag.Color label">
                                 @link.Tag.Name
-                                <i class="delete icon"></i>
+                                <i class="delete icon" @onclick="@(e => RemoveTagFromHost(link.Tag, host))"></i>
                             </div>
                         }
                     </td>
@@ -82,11 +86,14 @@
 
     List<Host> hosts { get; set; }
 
+    List<Tag> tags { get; set; }
+
     private bool active = true;
 
     protected override async Task OnInitAsync()
     {
         await RefreshHosts();
+        tags = await _tagsrepo.GetAll();
 
         RefreshLoop();
     }
@@ -112,6 +119,24 @@
             hosts = await _hostsrepo.GetAllActiveWithStates();
         else
             hosts = await _hostsrepo.GetAllActiveWithStates(id);
+    }
+
+    private async Task AddTagToHost(Tag tag, Host host)
+    {
+        try
+        {
+            await _tagsrepo.AddTagToHost(tag, host);
+            await RefreshHosts();
+        } catch (Exception ex) {}
+    }
+
+    private async Task RemoveTagFromHost(Tag tag, Host host)
+    {
+        try
+        {
+            await _tagsrepo.RemoveTagFromHost(tag, host);
+            await RefreshHosts();
+        } catch (Exception ex) {}
     }
 
     public void Dispose()
