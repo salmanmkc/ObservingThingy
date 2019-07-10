@@ -23,6 +23,9 @@ namespace ObservingThingy.Data
         {
             builder.Entity<HostListToHost>()
                 .HasKey(x => new { x.HostListId, x.HostId });
+
+            builder.Entity<TagToHost>()
+                .HasKey(x => new { x.TagId, x.HostId });
         }
     }
 

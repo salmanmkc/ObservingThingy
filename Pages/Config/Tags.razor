@@ -1,0 +1,131 @@
+@page "/config/tags"
+
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+@using ObservingThingy.Data
+@using ObservingThingy.DataAccess
+
+@inject TagsRepository _tagsrepo
+
+<div class="ui fluid basic segment container">
+
+    <h1>Tags</h1>
+
+    <table class="ui table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Color</th>
+                <th>IsBasic</th>
+                <th>IsInverted</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tag in tags)
+            {
+                <tr>
+                    <td class="collapsing">@tag.Id</td>
+                    <td>@tag.Name</td>
+                    <td>@tag.Color</td>
+                    <td>@tag.IsBasic</td>
+                    <td>@tag.IsInverted</td>
+                    <td class="right aligned">
+                        @if(@tag.IsValid)
+                        {
+                            <div class="ui button" @onclick="@(e => ToggleActiveState(@tag))">Disable</div>
+                        }
+                        else
+                        {
+                            <div class="ui button" @onclick="@(e => ToggleActiveState(@tag))">Enable</div>
+                        }
+                        <div class="ui negative button" @onclick="@(e => DeleteTag(@tag))">Delete</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <EditForm class="ui form" Model="@_data" OnValidSubmit="@AddNewTag">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="fields">
+
+            <div class="field">
+                <label for="">Name</label>
+                <input type="text" @bind="@_data.Name" />
+            </div>
+
+        </div>
+
+        <button class="ui positive button" type="submit">Create</button>
+
+    </EditForm>
+</div>
+
+@code
+{
+    List<Tag> tags { get; set; }
+
+    NewTagDataModel _data { get; set; } = new NewTagDataModel();
+
+    protected override async Task OnInitAsync()
+    {
+        tags = await _tagsrepo.GetAll();
+    }
+
+    protected async Task AddNewTag()
+    {
+        try
+        {
+            var tag = new Tag {
+                Name = _data.Name,
+                Color = _data.Color,
+                IsBasic = _data.IsBasic,
+                IsInverted = _data.IsInverted
+            };
+
+            await _tagsrepo.Create(tag);
+
+            _data = new NewTagDataModel();
+            await OnInitAsync();
+        }
+        catch (Exception ex) { }
+    }
+
+    protected async Task DeleteTag(Tag tag)
+    {
+        try
+        {
+            await _tagsrepo.Delete(tag);
+            await OnInitAsync();
+        }
+        catch (Exception ex) { }
+    }
+
+    protected async Task ToggleActiveState(Tag tag)
+    {
+        try
+        {
+            tag.IsValid = !tag.IsValid;
+            await _tagsrepo.Update(tag);
+            await OnInitAsync();
+        }
+        catch (Exception ex) { }
+    }
+
+    class NewTagDataModel
+    {
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public TagColor Color { get; set; } = TagColor.none;
+        [Required]
+        public bool IsBasic { get; set; } = false;
+        [Required]
+        public bool IsInverted { get; set; } = false;
+    }
+}

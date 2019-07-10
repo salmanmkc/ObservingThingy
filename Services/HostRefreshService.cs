@@ -117,15 +117,16 @@ namespace ObservingThingy.Services
             finally
             {
                 await hostsrepo.UpdateHostState(state);
+                _logger.LogInformation($"Check complete for host {host.Name} ({host.Hostname})");
             }
         }
 
         private async Task CreateStateEntries(HostsRepository hostsrepo)
         {
-            var hosts = await hostsrepo.GetAllActiveWithStates();
+            var states = (await hostsrepo.GetAllActiveWithStates())
+                .Select(x => new HostState { HostId = x.Id });
 
-            foreach (var host in hosts)
-                await hostsrepo.AddHostState(new HostState { HostId = host.Id });
+            await hostsrepo.AddHostState(states);
         }
     }
 }

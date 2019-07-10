@@ -40,6 +40,7 @@ namespace ObservingThingy
 
             services.AddScoped<HostsRepository>();
             services.AddScoped<HostListsRepository>();
+            services.AddScoped<TagsRepository>();
 
             services.AddHostedService<HostRefreshService>();
             services.AddHostedService<CleanupService>();

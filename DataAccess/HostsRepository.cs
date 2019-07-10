@@ -41,19 +41,25 @@ namespace ObservingThingy.DataAccess
                 return await context.Hosts
                     .Where(x => x.IsValid)
                     .Include(x => x.States)
+                    .Include(x => x.TagToHosts)
+                    .ThenInclude(x => x.Tag)
                     .ToListAsync();
         }
 
         internal async Task<List<Host>> GetAllActiveWithStates(int hostlistid)
         {
             using (var context = _factory())
-                return await context.Set<HostListToHost>()
+                return (await context.Set<HostListToHost>()
                     .Include(x => x.Host)
                     .ThenInclude(x => x.States)
-                    .Where(x => x.HostListId == hostlistid)
+                    .Include(x => x.Host)
+                    .ThenInclude(x => x.TagToHosts)
+                    .ThenInclude(x => x.Tag)
                     .Where(x => x.Host.IsValid)
+                    .Where(x => x.HostListId == hostlistid)
+                    .ToListAsync())
                     .Select(x => x.Host)
-                    .ToListAsync();
+                    .ToList();
         }
 
         internal async Task<Host> GetById(int id)
@@ -128,6 +134,16 @@ namespace ObservingThingy.DataAccess
             }
         }
 
+        internal async Task AddHostState(IEnumerable<HostState> state)
+        {
+            using (var context = _factory())
+            {
+                await context.Set<HostState>()
+                    .AddRangeAsync(state);
+                await context.SaveChangesAsync();
+            }
+        }
+
         internal async Task UpdateHostState(HostState state)
         {
             using (var context = _factory())
@@ -146,6 +162,21 @@ namespace ObservingThingy.DataAccess
                     .Remove(state);
                 await context.SaveChangesAsync();
             }
+        }
+        internal async Task RemoveHostState(IEnumerable<HostState> states)
+        {
+            using (var context = _factory())
+            {
+                context.Set<HostState>()
+                    .RemoveRange(states);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task Vacuum()
+        {
+            using (var context = _factory())
+                await context.Database.ExecuteSqlRawAsync("VACUUM;");
         }
     }
 }

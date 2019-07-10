@@ -46,7 +46,7 @@ namespace ObservingThingy
                 {
                     webBuilder
                         .UseStartup<Startup>()
-                        .UseUrls("http://localhost:5000", "http://*:5000");
+                        .UseUrls("http://*:5000");
                 });
     }
 }
