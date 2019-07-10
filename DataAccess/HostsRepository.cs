@@ -49,16 +49,17 @@ namespace ObservingThingy.DataAccess
         internal async Task<List<Host>> GetAllActiveWithStates(int hostlistid)
         {
             using (var context = _factory())
-                return await context.Set<HostListToHost>()
+                return (await context.Set<HostListToHost>()
                     .Include(x => x.Host)
                     .ThenInclude(x => x.States)
                     .Include(x => x.Host)
                     .ThenInclude(x => x.TagToHosts)
                     .ThenInclude(x => x.Tag)
-                    .Where(x => x.HostListId == hostlistid)
                     .Where(x => x.Host.IsValid)
+                    .Where(x => x.HostListId == hostlistid)
+                    .ToListAsync())
                     .Select(x => x.Host)
-                    .ToListAsync();
+                    .ToList();
         }
 
         internal async Task<Host> GetById(int id)
