@@ -147,5 +147,20 @@ namespace ObservingThingy.DataAccess
                 await context.SaveChangesAsync();
             }
         }
+        internal async Task RemoveHostState(IEnumerable<HostState> states)
+        {
+            using (var context = _factory())
+            {
+                context.Set<HostState>()
+                    .RemoveRange(states);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task Vacuum()
+        {
+            using (var context = _factory())
+                await context.Database.ExecuteSqlRawAsync("VACUUM;");
+        }
     }
 }
