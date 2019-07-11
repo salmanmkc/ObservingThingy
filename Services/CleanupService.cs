@@ -37,20 +37,7 @@ namespace ObservingThingy.Services
                 {
                     using (var scope = _provider.CreateScope())
                     {
-                        var removebefore = DateTimeOffset.Now - TimeSpan.FromHours(1); // TODO: Needs to be changed to something more sane
-
                         var repo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
-
-                        var hosts = await repo.GetAllWithStates();
-
-                        foreach (var host in hosts)
-                        {
-                            var removal = host.States
-                                .Where(x => x.Timestamp < removebefore)
-                                .ToList();
-
-                            await repo.RemoveHostState(removal);
-                        }
 
                         await repo.Vacuum();
                     }

@@ -17,18 +17,21 @@ namespace ObservingThingy.DataAccess
 
         internal void Add(IEnumerable<HostState> states)
         {
-            foreach (var state in states)
-                state.Id = _idcounter++;
+            var newstates = states.Select(x =>
+            {
+                x.Id = _idcounter++;
+                return x;
+            });
 
-            _hoststates.AddRange(states);
+            _hoststates.AddRange(newstates);
         }
 
         internal List<HostState> GetForHost(int hostid, int count = 10)
         {
             return _hoststates
                 .Where(x => x.HostId == hostid)
-                .OrderByDescending(x => x.Timestamp)
-                .Take(count)
+                .OrderBy(x => x.Id)
+                .TakeLast(count)
                 .ToList();
         }
 
