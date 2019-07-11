@@ -23,5 +23,10 @@ namespace ObservingThingy.Data
             Offline,
             Error
         }
+
+        public override string ToString()
+        {
+            return $"{Status} - {Delay}ms - {Timestamp}";
+        }
     }
 }

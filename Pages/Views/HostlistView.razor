@@ -64,7 +64,7 @@
                         <div class="pingsegments">
                             @foreach (var state in @_staterepo.GetForHost(@host.Id, 10))
                             {
-                                <div class="pingsegment @state.Status" title="@state.Delay"></div>
+                                <div class="pingsegment @state.Status" title="@state"></div>
                             }
                         </div>
                     </td>
