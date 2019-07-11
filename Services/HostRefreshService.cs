@@ -113,7 +113,7 @@ namespace ObservingThingy.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error while checking {host.Name} ({host.Hostname})");
+                _logger.LogError($"Error while checking {host.Name} ({host.Hostname})");
                 state.Status = HostState.StatusEnum.Error;
             }
             finally
