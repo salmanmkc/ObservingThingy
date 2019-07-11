@@ -37,10 +37,11 @@ namespace ObservingThingy.Services
                     using (var scope = _provider.CreateScope())
                     {
                         var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
+                        var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
 
-                        await CreateStateEntries(hostsrepo);
+                        await CreateStateEntries(hostsrepo, staterepo);
 
-                        await UpdateLastStateEntry(hostsrepo, stoppingToken);
+                        await UpdateLastStateEntry(hostsrepo, staterepo, stoppingToken);
                     }
                 }
                 catch (Exception ex)
@@ -57,20 +58,21 @@ namespace ObservingThingy.Services
             }
         }
 
-        private async Task UpdateLastStateEntry(HostsRepository hostsrepo, CancellationToken stoppingToken)
+        private async Task UpdateLastStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, CancellationToken stoppingToken)
         {
-            var hosts = await hostsrepo.GetAllActiveWithStates();
+            var hosts = await hostsrepo.GetAllActive();
 
-            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, x));
+            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, staterepo, x));
 
             await Task.WhenAll(checks);
         }
 
-        private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, Data.Host host)
+        private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, Data.Host host)
         {
             _logger.LogInformation($"Checking host {host.Name} ({host.Hostname})");
 
-            var state = await hostsrepo.GetLastHostState(host.Id);
+            var state = staterepo.GetForHost(host.Id)
+                .Last();
 
             var ping = new Ping();
 
@@ -116,17 +118,16 @@ namespace ObservingThingy.Services
             }
             finally
             {
-                await hostsrepo.UpdateHostState(state);
                 _logger.LogInformation($"Check complete for host {host.Name} ({host.Hostname})");
             }
         }
 
-        private async Task CreateStateEntries(HostsRepository hostsrepo)
+        private async Task CreateStateEntries(HostsRepository hostsrepo, HostStatesRepository staterepo)
         {
-            var states = (await hostsrepo.GetAllActiveWithStates())
+            var states = (await hostsrepo.GetAllActive())
                 .Select(x => new HostState { HostId = x.Id });
 
-            await hostsrepo.AddHostState(states);
+            staterepo.Add(states);
         }
     }
 }

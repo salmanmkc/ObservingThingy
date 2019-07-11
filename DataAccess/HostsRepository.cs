@@ -27,31 +27,21 @@ namespace ObservingThingy.DataAccess
                     .ToListAsync();
         }
 
-        internal async Task<List<Host>> GetAllWithStates()
-        {
-            using (var context = _factory())
-                return await context.Hosts
-                    .Include(x => x.States)
-                    .ToListAsync();
-        }
 
-        internal async Task<List<Host>> GetAllActiveWithStates()
+        internal async Task<List<Host>> GetAllActive()
         {
             using (var context = _factory())
                 return await context.Hosts
                     .Where(x => x.IsValid)
-                    .Include(x => x.States)
                     .Include(x => x.TagToHosts)
                     .ThenInclude(x => x.Tag)
                     .ToListAsync();
         }
 
-        internal async Task<List<Host>> GetAllActiveWithStates(int hostlistid)
+        internal async Task<List<Host>> GetAllActive(int hostlistid)
         {
             using (var context = _factory())
                 return (await context.Set<HostListToHost>()
-                    .Include(x => x.Host)
-                    .ThenInclude(x => x.States)
                     .Include(x => x.Host)
                     .ThenInclude(x => x.TagToHosts)
                     .ThenInclude(x => x.Tag)
@@ -110,65 +100,6 @@ namespace ObservingThingy.DataAccess
             using (var context = _factory())
             {
                 context.Hosts.Remove(host);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        internal async Task<HostState> GetLastHostState(int hostid)
-        {
-            using (var context = _factory())
-                return await context.Set<HostState>()
-                    .Where(x => x.HostId == hostid)
-                    .OrderByDescending(x => x.Timestamp)
-                    .FirstAsync();
-
-        }
-
-        internal async Task AddHostState(HostState state)
-        {
-            using (var context = _factory())
-            {
-                await context.Set<HostState>()
-                    .AddAsync(state);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        internal async Task AddHostState(IEnumerable<HostState> state)
-        {
-            using (var context = _factory())
-            {
-                await context.Set<HostState>()
-                    .AddRangeAsync(state);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        internal async Task UpdateHostState(HostState state)
-        {
-            using (var context = _factory())
-            {
-                context.Set<HostState>()
-                    .Update(state);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        internal async Task RemoveHostState(HostState state)
-        {
-            using (var context = _factory())
-            {
-                context.Set<HostState>()
-                    .Remove(state);
-                await context.SaveChangesAsync();
-            }
-        }
-        internal async Task RemoveHostState(IEnumerable<HostState> states)
-        {
-            using (var context = _factory())
-            {
-                context.Set<HostState>()
-                    .RemoveRange(states);
                 await context.SaveChangesAsync();
             }
         }

@@ -9,6 +9,7 @@
 @implements IDisposable
 
 @inject HostsRepository _hostsrepo
+@inject HostStatesRepository _staterepo
 @inject HostListsRepository _hostlistsrepo
 @inject TagsRepository _tagsrepo
 
@@ -60,7 +61,7 @@
 
                     <td class="right aligned collapsing">
                         <div class="pingsegments">
-                            @foreach (var state in @host.States.TakeLast(10))
+                            @foreach (var state in @_staterepo.GetForHost(@host.Id, 10))
                             {
                                 <div class="pingsegment @state.Status" title="@state.Delay"></div>
                             }
@@ -116,9 +117,9 @@
     private async Task RefreshHosts()
     {
         if (id == 0)
-            hosts = await _hostsrepo.GetAllActiveWithStates();
+            hosts = await _hostsrepo.GetAllActive();
         else
-            hosts = await _hostsrepo.GetAllActiveWithStates(id);
+            hosts = await _hostsrepo.GetAllActive(id);
     }
 
     private async Task AddTagToHost(Tag tag, Host host)
