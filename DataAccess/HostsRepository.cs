@@ -27,31 +27,21 @@ namespace ObservingThingy.DataAccess
                     .ToListAsync();
         }
 
-        internal async Task<List<Host>> GetAllWithStates()
-        {
-            using (var context = _factory())
-                return await context.Hosts
-                    .Include(x => x.States)
-                    .ToListAsync();
-        }
 
-        internal async Task<List<Host>> GetAllActiveWithStates()
+        internal async Task<List<Host>> GetAllActive()
         {
             using (var context = _factory())
                 return await context.Hosts
                     .Where(x => x.IsValid)
-                    .Include(x => x.States)
                     .Include(x => x.TagToHosts)
                     .ThenInclude(x => x.Tag)
                     .ToListAsync();
         }
 
-        internal async Task<List<Host>> GetAllActiveWithStates(int hostlistid)
+        internal async Task<List<Host>> GetAllActive(int hostlistid)
         {
             using (var context = _factory())
                 return (await context.Set<HostListToHost>()
-                    .Include(x => x.Host)
-                    .ThenInclude(x => x.States)
                     .Include(x => x.Host)
                     .ThenInclude(x => x.TagToHosts)
                     .ThenInclude(x => x.Tag)
@@ -130,6 +120,14 @@ namespace ObservingThingy.DataAccess
         {
             state.Id = _idcounter++;
             _hoststates.Add(state);
+        }
+
+        internal void Add(IEnumerable<HostState> states)
+        {
+            foreach (var state in states)
+                state.Id = _idcounter++;
+
+            _hoststates.AddRange(states);
         }
 
         internal List<HostState> GetForHost(int hostid, int count = 10)
