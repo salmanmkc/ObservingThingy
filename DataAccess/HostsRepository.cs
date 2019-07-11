@@ -114,65 +114,6 @@ namespace ObservingThingy.DataAccess
             }
         }
 
-        internal async Task<HostState> GetLastHostState(int hostid)
-        {
-            using (var context = _factory())
-                return await context.Set<HostState>()
-                    .Where(x => x.HostId == hostid)
-                    .OrderByDescending(x => x.Timestamp)
-                    .FirstAsync();
-
-        }
-
-        internal async Task AddHostState(HostState state)
-        {
-            using (var context = _factory())
-            {
-                await context.Set<HostState>()
-                    .AddAsync(state);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        internal async Task AddHostState(IEnumerable<HostState> state)
-        {
-            using (var context = _factory())
-            {
-                await context.Set<HostState>()
-                    .AddRangeAsync(state);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        internal async Task UpdateHostState(HostState state)
-        {
-            using (var context = _factory())
-            {
-                context.Set<HostState>()
-                    .Update(state);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        internal async Task RemoveHostState(HostState state)
-        {
-            using (var context = _factory())
-            {
-                context.Set<HostState>()
-                    .Remove(state);
-                await context.SaveChangesAsync();
-            }
-        }
-        internal async Task RemoveHostState(IEnumerable<HostState> states)
-        {
-            using (var context = _factory())
-            {
-                context.Set<HostState>()
-                    .RemoveRange(states);
-                await context.SaveChangesAsync();
-            }
-        }
-
         internal async Task Vacuum()
         {
             using (var context = _factory())
