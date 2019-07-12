@@ -26,7 +26,7 @@ namespace ObservingThingy.Data
 
         public override string ToString()
         {
-            return $"{Status} - {Delay}ms - {Timestamp}";
+            return $"{Status} - {Delay}ms - {Timestamp.ToString("g")}";
         }
     }
 }
