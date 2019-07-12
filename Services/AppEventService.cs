@@ -29,7 +29,7 @@ namespace ObservingThingy.Services
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Event loop started");
+                _logger.LogTrace("Event loop started");
 
                 try
                 {
@@ -46,7 +46,7 @@ namespace ObservingThingy.Services
                     _logger.LogError(ex, "Fatal error occurred during event processing loop");
                 }
 
-                _logger.LogInformation("Event loop finished");
+                _logger.LogTrace("Event loop finished");
 
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
