@@ -41,6 +41,12 @@ namespace ObservingThingy.DataAccess
                 return await context.Tags
                     .SingleAsync(x => x.Id == id);
         }
+        internal async Task<Tag> Get(string name)
+        {
+            using (var context = _factory())
+                return await context.Tags
+                    .SingleAsync(x => x.Name == name);
+        }
 
 
         internal async Task Create(Tag tag)
@@ -91,6 +97,11 @@ namespace ObservingThingy.DataAccess
             }
         }
 
+        internal async Task AddTagToHost(string tagname, Host host)
+        {
+            await AddTagToHost(await Get(tagname), host);
+        }
+
         internal async Task RemoveTagFromHost(Tag tag, Host host)
         {
             using (var context = _factory())
@@ -99,6 +110,11 @@ namespace ObservingThingy.DataAccess
                     .Remove(new TagToHost { TagId = tag.Id, HostId = host.Id });
                 await context.SaveChangesAsync();
             }
+        }
+
+        internal async Task RemoveTagFromHost(string tagname, Host host)
+        {
+            await RemoveTagFromHost(await Get(tagname), host);
         }
     }
 }

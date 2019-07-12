@@ -14,7 +14,6 @@ namespace ObservingThingy.Data
         public DbSet<Host> Hosts { get; set; }
         public DbSet<HostList> HostLists { get; set; }
         public DbSet<Service> Services { get; set; }
-        public DbSet<ApplicationEvent> Events { get; set; }
         public DbSet<Rule> Rules { get; set; }
         public DbSet<AppAction> Actions { get; set; }
         public DbSet<Tag> Tags { get; set; }
