@@ -76,7 +76,7 @@
         try
         {
             await _hostlistsrepo.AddHostToHostList(host, hostlist);
-        } catch (Exception ex) { }
+        } catch (Exception) { }
         await OnInitAsync();
     }
 
@@ -85,7 +85,7 @@
         try
         {
             await _hostlistsrepo.RemoveHostFromHostList(host, hostlist);
-        } catch (Exception ex) { }
+        } catch (Exception) { }
         await OnInitAsync();
     }
 }

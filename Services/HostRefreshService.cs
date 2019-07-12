@@ -38,10 +38,11 @@ namespace ObservingThingy.Services
                     {
                         var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
                         var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
+                        var eventrepo = scope.ServiceProvider.GetRequiredService<EventRepository>();
 
                         await CreateStateEntries(hostsrepo, staterepo);
 
-                        await UpdateLastStateEntry(hostsrepo, staterepo, stoppingToken);
+                        await UpdateLastStateEntry(hostsrepo, staterepo, eventrepo, stoppingToken);
                     }
                 }
                 catch (Exception ex)
@@ -58,18 +59,18 @@ namespace ObservingThingy.Services
             }
         }
 
-        private async Task UpdateLastStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, CancellationToken stoppingToken)
+        private async Task UpdateLastStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, EventRepository eventrepo, CancellationToken stoppingToken)
         {
             var hosts = await hostsrepo.GetAllActive();
 
-            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, staterepo, x));
+            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, staterepo, eventrepo, x));
 
             await Task.WhenAll(checks);
         }
 
-        private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, Data.Host host)
+        private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, EventRepository eventrepo, Data.Host host)
         {
-            _logger.LogInformation($"Checking host {host.Name} ({host.Hostname})");
+            _logger.LogTrace($"Checking host {host.Name} ({host.Hostname})");
 
             var state = staterepo.GetForHost(host.Id)
                 .Last();
@@ -99,10 +100,13 @@ namespace ObservingThingy.Services
                                 state.Status = HostState.StatusEnum.Error;
                                 break;
                         }
+
+                        await eventrepo.Enqueue(new HostOnlineEvent { HostId = host.Id });
                         break;
 
                     case IPStatus.TimedOut:
                         state.Status = HostState.StatusEnum.Offline;
+                        await eventrepo.Enqueue(new HostOfflineEvent { HostId = host.Id });
                         break;
 
                     default:
@@ -111,14 +115,14 @@ namespace ObservingThingy.Services
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError($"Error while checking {host.Name} ({host.Hostname})");
+                _logger.LogWarning($"Error while checking {host.Name} ({host.Hostname})");
                 state.Status = HostState.StatusEnum.Error;
             }
             finally
             {
-                _logger.LogInformation($"Check complete for host {host.Name} ({host.Hostname})");
+                _logger.LogTrace($"Check complete for host {host.Name} ({host.Hostname})");
             }
         }
 

@@ -12,6 +12,7 @@
 @inject HostStatesRepository _staterepo
 @inject HostListsRepository _hostlistsrepo
 @inject TagsRepository _tagsrepo
+@inject EventRepository _eventrepo
 
 <div class="ui fluid basic segment container">
 
@@ -24,7 +25,7 @@
                 <th>Name</th>
                 <th>Tags</th>
                 <th>Ping</th>
-                <th>Secondary Actions</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -34,8 +35,8 @@
                     <td class="collapsing">
                         @foreach (var tag in tags)
                         {
-                            <div class="ui basic icon button" @onclick="@(e => AddTagToHost(tag, host))">
-                                <i class="cloud icon"></i>
+                            <div class="ui compact basic icon button" @onclick="@(e => AddTagToHost(tag, host))">
+                                <i class="@tag.Icon icon"></i>
                             </div>
                         }
                     </td>
@@ -69,8 +70,11 @@
                     </td>
 
                     <td class="right aligned collapsing">
-                        <div class="ui disabled button">
-                            Connect
+                        <div class="ui compact disabled icon button">
+                            <i class="info icon"></i>
+                        </div>
+                        <div class="ui compact disabled icon button">
+                            <i class="desktop icon"></i>
                         </div>
                     </td>
                 </tr>
@@ -94,8 +98,8 @@
     protected override async Task OnInitAsync()
     {
         await RefreshHosts();
-        tags = await _tagsrepo.GetAll();
-
+        tags = await _tagsrepo.GetAllVisible();
+        
         RefreshLoop();
     }
 
@@ -126,18 +130,20 @@
     {
         try
         {
-            await _tagsrepo.AddTagToHost(tag, host);
+            await _tagsrepo.AddTagToHost(tag.Id, host.Id);
+            await _eventrepo.Enqueue(new TagAddedEvent { TagId = tag.Id, HostId = host.Id });
             await RefreshHosts();
-        } catch (Exception ex) {}
+        } catch (Exception) {}
     }
 
     private async Task RemoveTagFromHost(Tag tag, Host host)
     {
         try
         {
-            await _tagsrepo.RemoveTagFromHost(tag, host);
+            await _tagsrepo.RemoveTagFromHost(tag.Id, host.Id);
+            await _eventrepo.Enqueue(new TagRemovedEvent { TagId = tag.Id, HostId = host.Id });
             await RefreshHosts();
-        } catch (Exception ex) {}
+        } catch (Exception) {}
     }
 
     public void Dispose()

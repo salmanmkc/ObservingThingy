@@ -13,11 +13,8 @@ namespace ObservingThingy.Data
 
         public DbSet<Host> Hosts { get; set; }
         public DbSet<HostList> HostLists { get; set; }
-        public DbSet<Service> Services { get; set; }
-        public DbSet<ApplicationEvent> Events { get; set; }
-        public DbSet<Rule> Rules { get; set; }
-        public DbSet<AppAction> Actions { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<ApplicationEvent> ApplicationEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,6 +31,11 @@ namespace ObservingThingy.Data
 
             builder.Entity<TagToHost>()
                 .HasKey(x => new { x.TagId, x.HostId });
+
+            builder.Entity<TagAddedEvent>();
+            builder.Entity<TagRemovedEvent>();
+            builder.Entity<HostOnlineEvent>();
+            builder.Entity<HostOfflineEvent>();
         }
     }
 

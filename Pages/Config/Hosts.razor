@@ -88,7 +88,7 @@
             _data = new NewHostDataModel();
             await OnInitAsync();
         }
-        catch (Exception ex) { }
+        catch (Exception) { }
     }
 
     protected async Task DeleteHost(Host host)
@@ -98,7 +98,7 @@
             await _hostsrepo.Delete(host);
             await OnInitAsync();
         }
-        catch (Exception ex) { }
+        catch (Exception) { }
     }
 
     protected async Task ToggleActiveState(Host host)
@@ -109,7 +109,7 @@
             await _hostsrepo.Update(host);
             await OnInitAsync();
         }
-        catch (Exception ex) { }
+        catch (Exception) { }
     }
 
     class NewHostDataModel

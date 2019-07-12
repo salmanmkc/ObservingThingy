@@ -40,11 +40,13 @@ namespace ObservingThingy
 
             services.AddScoped<HostsRepository>();
             services.AddSingleton<HostStatesRepository>();
+            services.AddScoped<EventRepository>();
             services.AddScoped<HostListsRepository>();
             services.AddScoped<TagsRepository>();
 
             services.AddHostedService<HostRefreshService>();
             services.AddHostedService<CleanupService>();
+            services.AddHostedService<AppEventService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
