@@ -33,30 +33,22 @@ namespace ObservingThingy.DataAccess
             using (var context = _factory())
             {
                 var evt = await context.ApplicationEvents.FirstAsync();
+
+                switch (evt)
+                {
+                    case TagEvent e:
+                        await context.Entry(e).Reference(x => x.Host).LoadAsync();
+                        await context.Entry(e).Reference(x => x.Tag).LoadAsync();
+                        break;
+
+                    case HostEvent e:
+                        await context.Entry(e).Reference(x => x.Host).LoadAsync();
+                        break;
+                }
+                
                 context.Remove(evt);
                 await context.SaveChangesAsync();
                 return evt;
-            }
-        }
-
-        internal async Task Load(TagAddedEvent evt)
-        {
-            using (var context = _factory())
-            {
-                await context.Hosts.FindAsync(evt.HostId);
-                await context.Tags.FindAsync(evt.TagId);
-                await context.Entry(evt).Reference(x => x.Host).LoadAsync();
-                await context.Entry(evt).Reference(x => x.Tag).LoadAsync();
-            }
-        }
-        internal async Task Load(TagRemovedEvent evt)
-        {
-            using (var context = _factory())
-            {
-                await context.Hosts.FindAsync(evt.HostId);
-                await context.Tags.FindAsync(evt.TagId);
-                await context.Entry(evt).Reference(x => x.Host).LoadAsync();
-                await context.Entry(evt).Reference(x => x.Tag).LoadAsync();
             }
         }
 

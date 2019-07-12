@@ -69,18 +69,19 @@ namespace ObservingThingy.Services
             switch (appevent)
             {
                 case TagAddedEvent evt:
-                    await eventrepo.Load(evt);
                     await ProcessTagAddedEvent(tagrepo, evt);
                     break;
 
                 case TagRemovedEvent evt:
-                    await eventrepo.Load(evt);
                     break;
 
                 case HostOnlineEvent evt:
                     if (staterepo
                         .GetForHost(evt.HostId, 5)
-                        .All(x => x.Status == HostState.StatusEnum.Online)
+                        .All(x =>
+                            x.Status == HostState.StatusEnum.Online &&
+                            x.Status == HostState.StatusEnum.Warning &&
+                            x.Status == HostState.StatusEnum.Critical)
                         && !(await tagrepo.GetTagsForHost(evt.HostId)).Any(x => x.Name == "online"))
                     {
                         await tagrepo.AddTagToHost("online", evt.HostId);
