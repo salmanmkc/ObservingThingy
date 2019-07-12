@@ -35,7 +35,7 @@
                     <td class="collapsing">
                         @foreach (var tag in tags)
                         {
-                            <div class="ui basic icon button" @onclick="@(e => AddTagToHost(tag, host))">
+                            <div class="ui compact basic icon button" @onclick="@(e => AddTagToHost(tag, host))">
                                 <i class="@tag.Icon icon"></i>
                             </div>
                         }
@@ -70,10 +70,10 @@
                     </td>
 
                     <td class="right aligned collapsing">
-                        <div class="ui disabled icon button">
+                        <div class="ui compact disabled icon button">
                             <i class="info icon"></i>
                         </div>
-                        <div class="ui disabled icon button">
+                        <div class="ui compact disabled icon button">
                             <i class="desktop icon"></i>
                         </div>
                     </td>
