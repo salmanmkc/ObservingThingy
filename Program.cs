@@ -28,6 +28,8 @@ namespace ObservingThingy
                     using (var context = services.GetRequiredService<ApplicationDbContext>())
                     {
                         await context.Database.EnsureCreatedAsync();
+
+                        await SeedDatabase(context);
                     }
                 }
                 catch (Exception ex)
@@ -48,5 +50,34 @@ namespace ObservingThingy
                         .UseStartup<Startup>()
                         .UseUrls("http://*:5000");
                 });
+
+        private static async Task SeedDatabase(ApplicationDbContext context)
+        {
+            if (context.Tags.Count() > 0)
+                return;
+
+            await context.Tags.AddRangeAsync(new List<Tag>(){
+                new Tag { Name = "online",    Color = TagColor.green },
+                new Tag { Name = "offline",   Color = TagColor.red },
+
+                new Tag { Name = "step",      Color = TagColor.black, IsVisible = true },
+                new Tag { Name = "prepare",   Color = TagColor.yellow },
+                new Tag { Name = "restart",   Color = TagColor.orange },
+                new Tag { Name = "complete",  Color = TagColor.teal },
+
+                // new Tag { Name = "online-1",  Color = TagColor.green },
+                // new Tag { Name = "online-2",  Color = TagColor.green },
+                // new Tag { Name = "online-3",  Color = TagColor.green },
+                // new Tag { Name = "online-4",  Color = TagColor.green },
+                // new Tag { Name = "online-5",  Color = TagColor.green },
+                // new Tag { Name = "offline-1", Color = TagColor.red },
+                // new Tag { Name = "offline-2", Color = TagColor.red },
+                // new Tag { Name = "offline-3", Color = TagColor.red },
+                // new Tag { Name = "offline-4", Color = TagColor.red },
+                // new Tag { Name = "offline-5", Color = TagColor.red },
+            });
+
+            await context.SaveChangesAsync();
+        }
     }
 }

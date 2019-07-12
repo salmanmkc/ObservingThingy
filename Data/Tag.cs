@@ -8,6 +8,7 @@ namespace ObservingThingy.Data
         public TagColor Color { get; set; } = TagColor.none;
         public bool IsBasic { get; set; } = false;
         public bool IsInverted { get; set; } = false;
+        public bool IsVisible { get; set; } = false;
 
         public List<TagToHost> TagToHosts { get; set; }
 
