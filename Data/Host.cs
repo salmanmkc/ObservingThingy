@@ -6,8 +6,6 @@ namespace ObservingThingy.Data
     {
         public string Hostname { get; set; }
 
-        public List<Service> Services { get; set; }
-
         public List<HostListToHost> HostListToHosts { get; set; }
         public List<TagToHost> TagToHosts { get; set; }
 

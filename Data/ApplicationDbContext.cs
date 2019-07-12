@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace ObservingThingy.Data
 {
@@ -37,11 +33,6 @@ namespace ObservingThingy.Data
             builder.Entity<HostOnlineEvent>();
             builder.Entity<HostOfflineEvent>();
         }
-    }
-
-    public class AppAction : DataModel
-    {
-        public string Description { get; set; }
     }
 
     public interface IDataModel
