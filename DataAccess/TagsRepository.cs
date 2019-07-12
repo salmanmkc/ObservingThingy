@@ -26,6 +26,15 @@ namespace ObservingThingy.DataAccess
                     .ToListAsync();
         }
 
+        internal async Task<List<Tag>> GetAllVisible()
+        {
+            using (var context = _factory())
+                return await context.Tags
+                    .Where(x => x.IsValid == true)
+                    .Where(x => x.IsVisible == true)
+                    .ToListAsync();
+        }
+
         internal async Task<Tag> Get(int id)
         {
             using (var context = _factory())

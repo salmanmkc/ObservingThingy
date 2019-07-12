@@ -24,7 +24,7 @@
                 <th>Name</th>
                 <th>Tags</th>
                 <th>Ping</th>
-                <th>Secondary Actions</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -35,7 +35,7 @@
                         @foreach (var tag in tags)
                         {
                             <div class="ui basic icon button" @onclick="@(e => AddTagToHost(tag, host))">
-                                <i class="cloud icon"></i>
+                                <i class="@tag.Icon icon"></i>
                             </div>
                         }
                     </td>
@@ -69,8 +69,11 @@
                     </td>
 
                     <td class="right aligned collapsing">
-                        <div class="ui disabled button">
-                            Connect
+                        <div class="ui disabled icon button">
+                            <i class="info icon"></i>
+                        </div>
+                        <div class="ui disabled icon button">
+                            <i class="desktop icon"></i>
                         </div>
                     </td>
                 </tr>
@@ -94,7 +97,7 @@
     protected override async Task OnInitAsync()
     {
         await RefreshHosts();
-        tags = await _tagsrepo.GetAll();
+        tags = await _tagsrepo.GetAllVisible();
 
         RefreshLoop();
     }

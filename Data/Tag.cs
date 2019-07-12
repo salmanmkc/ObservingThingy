@@ -10,6 +10,8 @@ namespace ObservingThingy.Data
         public bool IsInverted { get; set; } = false;
         public bool IsVisible { get; set; } = false;
 
+        public string Icon { get; set; } = string.Empty;
+
         public List<TagToHost> TagToHosts { get; set; }
 
         public string GetCssClasses()
