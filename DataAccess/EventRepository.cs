@@ -43,8 +43,8 @@ namespace ObservingThingy.DataAccess
         {
             using (var context = _factory())
             {
-                await context.Hosts.SingleAsync(x => x.Id == evt.HostId);
-                await context.Tags.SingleAsync(x => x.Id == evt.TagId);
+                await context.Hosts.FindAsync(evt.HostId);
+                await context.Tags.FindAsync(evt.TagId);
                 await context.Entry(evt).Reference(x => x.Host).LoadAsync();
                 await context.Entry(evt).Reference(x => x.Tag).LoadAsync();
             }
@@ -53,8 +53,8 @@ namespace ObservingThingy.DataAccess
         {
             using (var context = _factory())
             {
-                await context.Hosts.SingleAsync(x => x.Id == evt.HostId);
-                await context.Tags.SingleAsync(x => x.Id == evt.TagId);
+                await context.Hosts.FindAsync(evt.HostId);
+                await context.Tags.FindAsync(evt.TagId);
                 await context.Entry(evt).Reference(x => x.Host).LoadAsync();
                 await context.Entry(evt).Reference(x => x.Tag).LoadAsync();
             }
