@@ -84,6 +84,9 @@ namespace ObservingThingy.Services
                             x.Status == HostState.StatusEnum.Critical)
                         && !(await tagrepo.GetTagsForHost(evt.HostId)).Any(x => x.Name == "online"))
                     {
+                        if (!(await tagrepo.GetTagsForHost(evt.HostId)).Any(x => x.Name == "offline"))
+                            break;
+
                         await tagrepo.AddTagToHost("online", evt.HostId);
                         await tagrepo.RemoveTagFromHost("offline", evt.HostId);
                     }
