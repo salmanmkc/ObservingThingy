@@ -79,8 +79,8 @@ namespace ObservingThingy.Services
                     if (staterepo
                         .GetForHost(evt.HostId, 5)
                         .All(x =>
-                            x.Status == HostState.StatusEnum.Online &&
-                            x.Status == HostState.StatusEnum.Warning &&
+                            x.Status == HostState.StatusEnum.Online ||
+                            x.Status == HostState.StatusEnum.Warning ||
                             x.Status == HostState.StatusEnum.Critical)
                         && !(await tagrepo.GetTagsForHost(evt.HostId)).Any(x => x.Name == "online"))
                     {
