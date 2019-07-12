@@ -93,7 +93,7 @@
             _data = new NewTagDataModel();
             await OnInitAsync();
         }
-        catch (Exception ex) { }
+        catch (Exception) { }
     }
 
     protected async Task DeleteTag(Tag tag)
@@ -103,7 +103,7 @@
             await _tagsrepo.Delete(tag);
             await OnInitAsync();
         }
-        catch (Exception ex) { }
+        catch (Exception) { }
     }
 
     protected async Task ToggleActiveState(Tag tag)
@@ -114,7 +114,7 @@
             await _tagsrepo.Update(tag);
             await OnInitAsync();
         }
-        catch (Exception ex) { }
+        catch (Exception) { }
     }
 
     class NewTagDataModel

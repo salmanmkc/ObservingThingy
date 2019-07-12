@@ -133,7 +133,7 @@
             await _tagsrepo.AddTagToHost(tag, host);
             _eventrepo.Enqueue(new TagAddedEvent { Tag = tag, Host = host });
             await RefreshHosts();
-        } catch (Exception ex) {}
+        } catch (Exception) {}
     }
 
     private async Task RemoveTagFromHost(Tag tag, Host host)
@@ -143,7 +143,7 @@
             await _tagsrepo.RemoveTagFromHost(tag, host);
             _eventrepo.Enqueue(new TagRemovedEvent { Tag = tag, Host = host });
             await RefreshHosts();
-        } catch (Exception ex) {}
+        } catch (Exception) {}
     }
 
     public void Dispose()

@@ -69,7 +69,7 @@ namespace ObservingThingy.Services
 
         private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, Data.Host host)
         {
-            _logger.LogInformation($"Checking host {host.Name} ({host.Hostname})");
+            _logger.LogTrace($"Checking host {host.Name} ({host.Hostname})");
 
             var state = staterepo.GetForHost(host.Id)
                 .Last();
@@ -111,7 +111,7 @@ namespace ObservingThingy.Services
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _logger.LogWarning($"Error while checking {host.Name} ({host.Hostname})");
                 state.Status = HostState.StatusEnum.Error;
