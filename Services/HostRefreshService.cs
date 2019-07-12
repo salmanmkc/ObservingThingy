@@ -15,11 +15,13 @@ namespace ObservingThingy.Services
     {
         private readonly IServiceProvider _provider;
         private readonly ILogger<HostRefreshService> _logger;
+        private readonly EventRepository _eventrepo;
 
-        public HostRefreshService(IServiceProvider provider, ILoggerFactory loggerfactory)
+        public HostRefreshService(IServiceProvider provider, ILoggerFactory loggerfactory, EventRepository eventrepo)
         {
             _provider = provider;
             _logger = loggerfactory.CreateLogger<HostRefreshService>();
+            _eventrepo = eventrepo;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -99,10 +101,13 @@ namespace ObservingThingy.Services
                                 state.Status = HostState.StatusEnum.Error;
                                 break;
                         }
+
+                        _eventrepo.Enqueue(new HostOnlineEvent { Host = host });
                         break;
 
                     case IPStatus.TimedOut:
                         state.Status = HostState.StatusEnum.Offline;
+                        _eventrepo.Enqueue(new HostOfflineEvent { Host = host });
                         break;
 
                     default:

@@ -27,9 +27,11 @@ namespace ObservingThingy.Services
         {
             _logger.LogInformation($"Service {nameof(AppEventService)} started");
 
+            var eventprocessed = false;
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogTrace("Event loop started");
+                eventprocessed = false;
 
                 try
                 {
@@ -37,8 +39,9 @@ namespace ObservingThingy.Services
                     {
                         var eventrepo = scope.ServiceProvider.GetRequiredService<EventRepository>();
                         var tagrepo = scope.ServiceProvider.GetRequiredService<TagsRepository>();
+                        var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
 
-                        await LoopProcessor(eventrepo, tagrepo);
+                        eventprocessed = await LoopProcessor(eventrepo, tagrepo, staterepo);
                     }
                 }
                 catch (Exception ex)
@@ -48,16 +51,20 @@ namespace ObservingThingy.Services
 
                 _logger.LogTrace("Event loop finished");
 
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                if (!eventprocessed)
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
 
-        internal async Task LoopProcessor(EventRepository eventrepo, TagsRepository tagrepo)
+        internal async Task<bool> LoopProcessor(EventRepository eventrepo, TagsRepository tagrepo, HostStatesRepository staterepo)
         {
             if (!eventrepo.HasElements)
-                return;
+                return false;
 
             var appevent = eventrepo.Dequeue();
+
+            if (appevent == null)
+                return true;
 
             switch (appevent)
             {
@@ -68,10 +75,34 @@ namespace ObservingThingy.Services
                 case TagRemovedEvent evt:
                     break;
 
+                case HostOnlineEvent evt:
+                    if (staterepo
+                        .GetForHost(evt.Host.Id, 5)
+                        .All(x => x.Status == HostState.StatusEnum.Online)
+                        && !(await tagrepo.GetTagsForHost(evt.Host.Id)).Any(x => x.Name == "online"))
+                    {
+                        await tagrepo.AddTagToHost("online", evt.Host);
+                        await tagrepo.RemoveTagFromHost("offline", evt.Host);
+                    }
+                    break;
+
+                case HostOfflineEvent evt:
+                    if (staterepo
+                        .GetForHost(evt.Host.Id, 5)
+                        .All(x => x.Status == HostState.StatusEnum.Offline)
+                        && !(await tagrepo.GetTagsForHost(evt.Host.Id)).Any(x => x.Name == "offline"))
+                    {
+                        await tagrepo.AddTagToHost("offline", evt.Host);
+                        await tagrepo.RemoveTagFromHost("online", evt.Host);
+                    }
+                    break;
+
                 default:
                     _logger.LogError($"Unknown event type {appevent.ToString()}");
                     break;
             }
+
+            return true;
         }
 
         private static async Task ProcessTagAddedEvent(TagsRepository tagrepo, TagAddedEvent evt)

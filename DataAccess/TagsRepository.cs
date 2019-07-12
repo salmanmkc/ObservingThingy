@@ -105,11 +105,14 @@ namespace ObservingThingy.DataAccess
         internal async Task RemoveTagFromHost(Tag tag, Host host)
         {
             using (var context = _factory())
-            {
-                context.Set<TagToHost>()
-                    .Remove(new TagToHost { TagId = tag.Id, HostId = host.Id });
-                await context.SaveChangesAsync();
-            }
+                if (await context.Set<TagToHost>()
+                    .Where(x => x.TagId == tag.Id && x.HostId == host.Id)
+                    .AnyAsync())
+                {
+                    context.Set<TagToHost>()
+                        .Remove(new TagToHost { TagId = tag.Id, HostId = host.Id });
+                    await context.SaveChangesAsync();
+                }
         }
 
         internal async Task RemoveTagFromHost(string tagname, Host host)
