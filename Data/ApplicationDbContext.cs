@@ -21,6 +21,14 @@ namespace ObservingThingy.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Host>()
+                .HasAlternateKey(x => x.Hostname);
+            builder.Entity<HostList>()
+                .HasAlternateKey(x => x.Name);
+
+            builder.Entity<Tag>()
+                .HasAlternateKey(x => x.Name);
+
             builder.Entity<HostListToHost>()
                 .HasKey(x => new { x.HostListId, x.HostId });
 
