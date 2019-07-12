@@ -68,19 +68,19 @@ namespace ObservingThingy.Services
                             await tagrepo.RemoveTagFromHost(evt.Tag, evt.Host);
                             var tags = await tagrepo.GetTagsForHost(evt.Host.Id);
 
-                            if (tags.Where(x => x.Name == "restart").Count() > 0)
-                            {
-                                await tagrepo.AddTagToHost("complete", evt.Host);
-                                await tagrepo.RemoveTagFromHost("restart", evt.Host);
-                            }
-                            else if (tags.Where(x => x.Name == "prepare").Count() > 0)
-                            {
-                                await tagrepo.AddTagToHost("restart", evt.Host);
-                                await tagrepo.RemoveTagFromHost("prepare", evt.Host);
-                            }
-                            else
+                            if (!tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
                             {
                                 await tagrepo.AddTagToHost("prepare", evt.Host);
+                            }
+                            else if (tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
+                            {
+                                await tagrepo.RemoveTagFromHost("prepare", evt.Host);
+                                await tagrepo.AddTagToHost("restart", evt.Host);
+                            }
+                            else if (!tags.Any(x => x.Name == "prepare") && tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
+                            {
+                                await tagrepo.RemoveTagFromHost("restart", evt.Host);
+                                await tagrepo.AddTagToHost("complete", evt.Host);
                             }
                             break;
                     }
