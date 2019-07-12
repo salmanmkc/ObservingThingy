@@ -130,8 +130,8 @@
     {
         try
         {
-            await _tagsrepo.AddTagToHost(tag, host);
-            _eventrepo.Enqueue(new TagAddedEvent { Tag = tag, Host = host });
+            await _tagsrepo.AddTagToHost(tag.Id, host.Id);
+            await _eventrepo.Enqueue(new TagAddedEvent { TagId = tag.Id, HostId = host.Id });
             await RefreshHosts();
         } catch (Exception) {}
     }
@@ -140,8 +140,8 @@
     {
         try
         {
-            await _tagsrepo.RemoveTagFromHost(tag, host);
-            _eventrepo.Enqueue(new TagRemovedEvent { Tag = tag, Host = host });
+            await _tagsrepo.RemoveTagFromHost(tag.Id, host.Id);
+            await _eventrepo.Enqueue(new TagRemovedEvent { TagId = tag.Id, HostId = host.Id });
             await RefreshHosts();
         } catch (Exception) {}
     }

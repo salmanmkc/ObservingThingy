@@ -1,24 +1,72 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ObservingThingy.Data;
 
 namespace ObservingThingy.DataAccess
 {
     public class EventRepository
     {
-        private Queue<ApplicationEvent> _appevents = new Queue<ApplicationEvent>();
-        int _idcounter = 1;
+        private readonly Func<ApplicationDbContext> _factory;
+        private readonly ILogger<EventRepository> _logger;
 
-        internal void Enqueue(ApplicationEvent appevent)
+        public EventRepository(ILoggerFactory loggerfactory, Func<ApplicationDbContext> factory)
         {
-            _appevents.Enqueue(appevent);
+            _factory = factory;
+            _logger = loggerfactory.CreateLogger<EventRepository>();
         }
 
-        internal ApplicationEvent Dequeue()
+        internal async Task Enqueue(ApplicationEvent appevent)
         {
-            return _appevents.Dequeue();
+            using (var context = _factory())
+            {
+                await context.ApplicationEvents.AddAsync(appevent);
+                await context.SaveChangesAsync();
+            }
         }
 
-        internal bool HasElements { get { return _appevents.Count > 0; } }
+        internal async Task<ApplicationEvent> Dequeue()
+        {
+            using (var context = _factory())
+            {
+                var evt = await context.ApplicationEvents.FirstAsync();
+                context.Remove(evt);
+                await context.SaveChangesAsync();
+                return evt;
+            }
+        }
+
+        internal async Task Load(TagAddedEvent evt)
+        {
+            using (var context = _factory())
+            {
+                await context.Hosts.SingleAsync(x => x.Id == evt.HostId);
+                await context.Tags.SingleAsync(x => x.Id == evt.TagId);
+                await context.Entry(evt).Reference(x => x.Host).LoadAsync();
+                await context.Entry(evt).Reference(x => x.Tag).LoadAsync();
+            }
+        }
+        internal async Task Load(TagRemovedEvent evt)
+        {
+            using (var context = _factory())
+            {
+                await context.Hosts.SingleAsync(x => x.Id == evt.HostId);
+                await context.Tags.SingleAsync(x => x.Id == evt.TagId);
+                await context.Entry(evt).Reference(x => x.Host).LoadAsync();
+                await context.Entry(evt).Reference(x => x.Tag).LoadAsync();
+            }
+        }
+
+        internal bool HasElements
+        {
+            get
+            {
+                using (var context = _factory())
+                    return context.ApplicationEvents.Count() > 0;
+            }
+        }
     }
 }

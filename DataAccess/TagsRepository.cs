@@ -87,37 +87,34 @@ namespace ObservingThingy.DataAccess
 
         }
 
-        internal async Task AddTagToHost(Tag tag, Host host)
+        internal async Task AddTagToHost(int tagid, int hostid)
         {
             using (var context = _factory())
             {
                 await context.Set<TagToHost>()
-                    .AddAsync(new TagToHost { TagId = tag.Id, HostId = host.Id });
+                    .AddAsync(new TagToHost { TagId = tagid, HostId = hostid });
                 await context.SaveChangesAsync();
             }
         }
 
-        internal async Task AddTagToHost(string tagname, Host host)
+        internal async Task AddTagToHost(string tagname, int hostid)
         {
-            await AddTagToHost(await Get(tagname), host);
+            await AddTagToHost((await Get(tagname)).Id, hostid);
         }
 
-        internal async Task RemoveTagFromHost(Tag tag, Host host)
+        internal async Task RemoveTagFromHost(int tagid, int hostid)
         {
             using (var context = _factory())
-                if (await context.Set<TagToHost>()
-                    .Where(x => x.TagId == tag.Id && x.HostId == host.Id)
-                    .AnyAsync())
-                {
-                    context.Set<TagToHost>()
-                        .Remove(new TagToHost { TagId = tag.Id, HostId = host.Id });
-                    await context.SaveChangesAsync();
-                }
+            {
+                context.Set<TagToHost>()
+                    .Remove(new TagToHost { TagId = tagid, HostId = hostid });
+                await context.SaveChangesAsync();
+            }
         }
 
-        internal async Task RemoveTagFromHost(string tagname, Host host)
+        internal async Task RemoveTagFromHost(string tagname, int hostid)
         {
-            await RemoveTagFromHost(await Get(tagname), host);
+            await RemoveTagFromHost((await Get(tagname)).Id, hostid);
         }
     }
 }

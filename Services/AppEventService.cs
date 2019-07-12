@@ -61,7 +61,7 @@ namespace ObservingThingy.Services
             if (!eventrepo.HasElements)
                 return false;
 
-            var appevent = eventrepo.Dequeue();
+            var appevent = await eventrepo.Dequeue();
 
             if (appevent == null)
                 return true;
@@ -69,31 +69,33 @@ namespace ObservingThingy.Services
             switch (appevent)
             {
                 case TagAddedEvent evt:
+                    await eventrepo.Load(evt);
                     await ProcessTagAddedEvent(tagrepo, evt);
                     break;
 
                 case TagRemovedEvent evt:
+                    await eventrepo.Load(evt);
                     break;
 
                 case HostOnlineEvent evt:
                     if (staterepo
-                        .GetForHost(evt.Host.Id, 5)
+                        .GetForHost(evt.HostId, 5)
                         .All(x => x.Status == HostState.StatusEnum.Online)
-                        && !(await tagrepo.GetTagsForHost(evt.Host.Id)).Any(x => x.Name == "online"))
+                        && !(await tagrepo.GetTagsForHost(evt.HostId)).Any(x => x.Name == "online"))
                     {
-                        await tagrepo.AddTagToHost("online", evt.Host);
-                        await tagrepo.RemoveTagFromHost("offline", evt.Host);
+                        await tagrepo.AddTagToHost("online", evt.HostId);
+                        await tagrepo.RemoveTagFromHost("offline", evt.HostId);
                     }
                     break;
 
                 case HostOfflineEvent evt:
                     if (staterepo
-                        .GetForHost(evt.Host.Id, 5)
+                        .GetForHost(evt.HostId, 5)
                         .All(x => x.Status == HostState.StatusEnum.Offline)
-                        && !(await tagrepo.GetTagsForHost(evt.Host.Id)).Any(x => x.Name == "offline"))
+                        && !(await tagrepo.GetTagsForHost(evt.HostId)).Any(x => x.Name == "offline"))
                     {
-                        await tagrepo.AddTagToHost("offline", evt.Host);
-                        await tagrepo.RemoveTagFromHost("online", evt.Host);
+                        await tagrepo.AddTagToHost("offline", evt.HostId);
+                        await tagrepo.RemoveTagFromHost("online", evt.HostId);
                     }
                     break;
 
@@ -110,22 +112,22 @@ namespace ObservingThingy.Services
             switch (evt.Tag.Name)
             {
                 case "step":
-                    await tagrepo.RemoveTagFromHost(evt.Tag, evt.Host);
+                    await tagrepo.RemoveTagFromHost(evt.TagId, evt.HostId);
                     var tags = await tagrepo.GetTagsForHost(evt.Host.Id);
 
                     if (!tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
                     {
-                        await tagrepo.AddTagToHost("prepare", evt.Host);
+                        await tagrepo.AddTagToHost("prepare", evt.HostId);
                     }
                     else if (tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
                     {
-                        await tagrepo.RemoveTagFromHost("prepare", evt.Host);
-                        await tagrepo.AddTagToHost("restart", evt.Host);
+                        await tagrepo.RemoveTagFromHost("prepare", evt.HostId);
+                        await tagrepo.AddTagToHost("restart", evt.HostId);
                     }
                     else if (!tags.Any(x => x.Name == "prepare") && tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
                     {
-                        await tagrepo.RemoveTagFromHost("restart", evt.Host);
-                        await tagrepo.AddTagToHost("complete", evt.Host);
+                        await tagrepo.RemoveTagFromHost("restart", evt.HostId);
+                        await tagrepo.AddTagToHost("complete", evt.HostId);
                     }
                     break;
             }

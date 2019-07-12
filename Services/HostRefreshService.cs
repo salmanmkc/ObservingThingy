@@ -15,13 +15,11 @@ namespace ObservingThingy.Services
     {
         private readonly IServiceProvider _provider;
         private readonly ILogger<HostRefreshService> _logger;
-        private readonly EventRepository _eventrepo;
 
-        public HostRefreshService(IServiceProvider provider, ILoggerFactory loggerfactory, EventRepository eventrepo)
+        public HostRefreshService(IServiceProvider provider, ILoggerFactory loggerfactory)
         {
             _provider = provider;
             _logger = loggerfactory.CreateLogger<HostRefreshService>();
-            _eventrepo = eventrepo;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,10 +38,11 @@ namespace ObservingThingy.Services
                     {
                         var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
                         var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
+                        var eventrepo = scope.ServiceProvider.GetRequiredService<EventRepository>();
 
                         await CreateStateEntries(hostsrepo, staterepo);
 
-                        await UpdateLastStateEntry(hostsrepo, staterepo, stoppingToken);
+                        await UpdateLastStateEntry(hostsrepo, staterepo, eventrepo, stoppingToken);
                     }
                 }
                 catch (Exception ex)
@@ -60,16 +59,16 @@ namespace ObservingThingy.Services
             }
         }
 
-        private async Task UpdateLastStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, CancellationToken stoppingToken)
+        private async Task UpdateLastStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, EventRepository eventrepo, CancellationToken stoppingToken)
         {
             var hosts = await hostsrepo.GetAllActive();
 
-            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, staterepo, x));
+            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, staterepo, eventrepo, x));
 
             await Task.WhenAll(checks);
         }
 
-        private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, Data.Host host)
+        private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, EventRepository eventrepo, Data.Host host)
         {
             _logger.LogTrace($"Checking host {host.Name} ({host.Hostname})");
 
@@ -102,12 +101,12 @@ namespace ObservingThingy.Services
                                 break;
                         }
 
-                        _eventrepo.Enqueue(new HostOnlineEvent { Host = host });
+                        await eventrepo.Enqueue(new HostOnlineEvent { HostId = host.Id });
                         break;
 
                     case IPStatus.TimedOut:
                         state.Status = HostState.StatusEnum.Offline;
-                        _eventrepo.Enqueue(new HostOfflineEvent { Host = host });
+                        await eventrepo.Enqueue(new HostOfflineEvent { HostId = host.Id });
                         break;
 
                     default:
