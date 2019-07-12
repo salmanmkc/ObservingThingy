@@ -56,7 +56,7 @@ namespace ObservingThingy.DataAccess
         {
             using (var context = _factory())
                 return await context.Hosts
-                    .SingleAsync(x => x.Id == id);
+                    .FindAsync(id);
         }
 
         internal async Task Create(Host host)
