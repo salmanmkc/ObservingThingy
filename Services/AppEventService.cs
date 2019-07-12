@@ -62,28 +62,7 @@ namespace ObservingThingy.Services
             switch (appevent)
             {
                 case TagAddedEvent evt:
-                    switch (evt.Tag.Name)
-                    {
-                        case "step":
-                            await tagrepo.RemoveTagFromHost(evt.Tag, evt.Host);
-                            var tags = await tagrepo.GetTagsForHost(evt.Host.Id);
-
-                            if (!tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
-                            {
-                                await tagrepo.AddTagToHost("prepare", evt.Host);
-                            }
-                            else if (tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
-                            {
-                                await tagrepo.RemoveTagFromHost("prepare", evt.Host);
-                                await tagrepo.AddTagToHost("restart", evt.Host);
-                            }
-                            else if (!tags.Any(x => x.Name == "prepare") && tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
-                            {
-                                await tagrepo.RemoveTagFromHost("restart", evt.Host);
-                                await tagrepo.AddTagToHost("complete", evt.Host);
-                            }
-                            break;
-                    }
+                    await ProcessTagAddedEvent(tagrepo, evt);
                     break;
 
                 case TagRemovedEvent evt:
@@ -91,6 +70,32 @@ namespace ObservingThingy.Services
 
                 default:
                     _logger.LogError($"Unknown event type {appevent.ToString()}");
+                    break;
+            }
+        }
+
+        private static async Task ProcessTagAddedEvent(TagsRepository tagrepo, TagAddedEvent evt)
+        {
+            switch (evt.Tag.Name)
+            {
+                case "step":
+                    await tagrepo.RemoveTagFromHost(evt.Tag, evt.Host);
+                    var tags = await tagrepo.GetTagsForHost(evt.Host.Id);
+
+                    if (!tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
+                    {
+                        await tagrepo.AddTagToHost("prepare", evt.Host);
+                    }
+                    else if (tags.Any(x => x.Name == "prepare") && !tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
+                    {
+                        await tagrepo.RemoveTagFromHost("prepare", evt.Host);
+                        await tagrepo.AddTagToHost("restart", evt.Host);
+                    }
+                    else if (!tags.Any(x => x.Name == "prepare") && tags.Any(x => x.Name == "restart") && !tags.Any(x => x.Name == "complete"))
+                    {
+                        await tagrepo.RemoveTagFromHost("restart", evt.Host);
+                        await tagrepo.AddTagToHost("complete", evt.Host);
+                    }
                     break;
             }
         }
