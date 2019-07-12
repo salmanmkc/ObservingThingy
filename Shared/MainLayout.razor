@@ -12,12 +12,12 @@
 
     <NavLink href="/" class="ui item" Match="NavLinkMatch.All">Home</NavLink>
 
+    <NavLink href="/views/0" class="ui item" Match="NavLinkMatch.All">All Hosts</NavLink>
+
     <div class="ui dropdown item">
         Hostlists
         <i class="dropdown icon"></i>
         <div class="menu">
-            <a href="/views/0" class="item">All</a>
-            <div class="divider"></div>
             @foreach (var hostlist in hostlists)
             {
                 <a href="/views/@hostlist.Id" class="item">@hostlist.Name</a>
