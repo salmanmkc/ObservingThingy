@@ -41,6 +41,7 @@ namespace ObservingThingy.DataAccess
             using (var context = _factory())
                 return (await this.Get(id))
                     .HostListToHosts
+                    .OrderBy(x => x.SortNumber)
                     .Select(x => x.Host)
                     .ToList();
         }
@@ -93,6 +94,65 @@ namespace ObservingThingy.DataAccess
                 var link = hostlist.HostListToHosts.Single(x => x.HostId == host.Id && x.HostListId == hostlist.Id);
                 context.Set<HostListToHost>()
                     .Remove(link);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        internal async Task MoveHostDown(int hostid, int hostlistid)
+        {
+            await EnsureHostOrder(hostlistid);
+
+            using (var context = _factory())
+            {
+                var links = await context.Set<HostListToHost>()
+                    .Where(x => x.HostListId == hostlistid)
+                    .ToListAsync();
+
+                var host = links.Single(x => x.HostId == hostid);
+                if (host.SortNumber <= 0)
+                    return;
+                var otherhost = links.Single(x => x.SortNumber == host.SortNumber - 1);
+
+                host.SortNumber--;
+                otherhost.SortNumber++;
+
+                await context.SaveChangesAsync();
+            }
+        }
+        internal async Task MoveHostUp(int hostid, int hostlistid)
+        {
+            await EnsureHostOrder(hostlistid);
+
+            using (var context = _factory())
+            {
+                var links = await context.Set<HostListToHost>()
+                    .Where(x => x.HostListId == hostlistid)
+                    .ToListAsync();
+
+                var host = links.Single(x => x.HostId == hostid);
+                if (host.SortNumber >= (links.Count - 1))
+                    return;
+                var otherhost = links.Single(x => x.SortNumber == host.SortNumber + 1);
+
+                host.SortNumber++;
+                otherhost.SortNumber--;
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        private async Task EnsureHostOrder(int hostlistid)
+        {
+            using (var context = _factory())
+            {
+                var links = await context.Set<HostListToHost>()
+                    .Where(x => x.HostListId == hostlistid)
+                    .OrderBy(x => x.SortNumber)
+                    .ToListAsync();
+
+                for (int i = 0; i < links.Count; i++)
+                    links[i].SortNumber = i;
+
                 await context.SaveChangesAsync();
             }
         }

@@ -30,8 +30,8 @@
                     <td>@host.Hostname</td>
                     <td class="right aligned">
                         <div class="ui icon buttons">
-                            <div class="ui disabled button"><i class="chevron down icon"></i></div>
-                            <div class="ui disabled button"><i class="chevron up icon"></i></div>
+                            <div class="ui button" @onclick="@(e => MoveHostUp(@host))"><i class="chevron down icon"></i></div>
+                            <div class="ui button" @onclick="@(e => MoveHostDown(@host))"><i class="chevron up icon"></i></div>
                         </div>
                         <div class="ui negative button" @onclick="@(e => RemoveHostFromHostList(@host))">Remove</div>
                     </td>
@@ -68,7 +68,7 @@
     {
         hostlist = await _hostlistsrepo.Get(id);
         hosts = await _hostlistsrepo.GetHosts(id);
-        allhosts = await _hostsrepo.GetAll();
+        allhosts = await _hostsrepo.GetAllSorted();
     }
 
     async Task AddHostToHostList(Host host)
@@ -85,6 +85,24 @@
         try
         {
             await _hostlistsrepo.RemoveHostFromHostList(host, hostlist);
+        } catch (Exception) { }
+        await OnInitAsync();
+    }
+
+    async Task MoveHostUp(Host host)
+    {
+        try
+        {
+            await _hostlistsrepo.MoveHostUp(host.Id, hostlist.Id);
+        } catch (Exception) { }
+        await OnInitAsync();
+    }
+
+    async Task MoveHostDown(Host host)
+    {
+        try
+        {
+            await _hostlistsrepo.MoveHostDown(host.Id, hostlist.Id);
         } catch (Exception) { }
         await OnInitAsync();
     }
