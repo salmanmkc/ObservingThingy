@@ -27,6 +27,15 @@ namespace ObservingThingy.DataAccess
                     .ToListAsync();
         }
 
+        internal async Task<List<Host>> GetAllSorted()
+        {
+            using (var context = _factory())
+                return await context.Hosts
+                    .Where(x => x.IsValid)
+                    .OrderBy(x => x.Hostname)
+                    .ToListAsync();
+        }
+
 
         internal async Task<List<Host>> GetAllActive()
         {
@@ -35,6 +44,7 @@ namespace ObservingThingy.DataAccess
                     .Where(x => x.IsValid)
                     .Include(x => x.TagToHosts)
                     .ThenInclude(x => x.Tag)
+                    .OrderBy(x => x.Hostname)
                     .ToListAsync();
         }
 
@@ -47,6 +57,7 @@ namespace ObservingThingy.DataAccess
                     .ThenInclude(x => x.Tag)
                     .Where(x => x.Host.IsValid)
                     .Where(x => x.HostListId == hostlistid)
+                    .OrderBy(x => x.SortNumber)
                     .ToListAsync())
                     .Select(x => x.Host)
                     .ToList();

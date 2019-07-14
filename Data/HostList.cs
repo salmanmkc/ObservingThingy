@@ -13,5 +13,6 @@ namespace ObservingThingy.Data
         public HostList HostList { get; set; }
         public int HostId { get; set; }
         public Host Host { get; set; }
+        public int SortNumber {get;set;}
     }
 }
