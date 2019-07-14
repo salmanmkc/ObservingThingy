@@ -7,15 +7,13 @@
 @inject HostListsRepository _hostlistsrepo
 @inject IJSRuntime _js;
 
-<div class="ui attached inverted menu">
+<div class="ui teal attached inverted menu">
     <a href="" class="header item">ObservingThingy</a>
 
-    <NavLink href="/" class="ui item" Match="NavLinkMatch.All">Home</NavLink>
-
-    <NavLink href="/views/0" class="ui item" Match="NavLinkMatch.All">All Hosts</NavLink>
+    <NavLink href="/views/0" class="ui item" Match="NavLinkMatch.All">All</NavLink>
 
     <div class="ui dropdown item">
-        Hostlists
+        Lists
         <i class="dropdown icon"></i>
         <div class="menu">
             @foreach (var hostlist in hostlists)
@@ -25,17 +23,15 @@
         </div>
     </div>
 
-    <div class="ui disabled item">
-        Profiles
-    </div>
-
-    <div class="ui dropdown item">
-        Config
-        <i class="dropdown icon"></i>
-        <div class="menu">
-            <NavLink href="/config/hosts" class="item" Match="NavLinkMatch.All">Hosts</NavLink>
-            <NavLink href="/config/hostlists" class="item" Match="NavLinkMatch.All">Host Lists</NavLink>
-            <NavLink href="/config/tags" class="item" Match="NavLinkMatch.All">Tags</NavLink>
+    <div class="right menu">
+        <div class="ui borderless dropdown item">
+            <i class="ellipsis vertical icon"></i>
+            <div class="menu">
+                <div class="header">Configuration</div>
+                <NavLink href="/config/hosts" class="item" Match="NavLinkMatch.All">Hosts</NavLink>
+                <NavLink href="/config/hostlists" class="item" Match="NavLinkMatch.All">Host Lists</NavLink>
+                <NavLink href="/config/tags" class="item" Match="NavLinkMatch.All">Tags</NavLink>
+            </div>
         </div>
     </div>
 </div>

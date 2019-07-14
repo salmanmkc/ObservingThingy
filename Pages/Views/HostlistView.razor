@@ -14,20 +14,11 @@
 @inject TagsRepository _tagsrepo
 @inject EventRepository _eventrepo
 
-<div class="ui fluid basic segment container">
+<div class="ui fluid basic segment inverted container">
 
     <!-- <h1>Hosts</h1> -->
 
-    <table class="ui very basic very compact unstackable table">
-        <thead>
-            <tr>
-                <th>Actions</th>
-                <th>Name</th>
-                <th>Tags</th>
-                <th>Ping</th>
-                <th></th>
-            </tr>
-        </thead>
+    <table class="ui very basic very compact unstackable inverted table">
         <tbody>
             @foreach (var host in hosts)
             {
@@ -35,7 +26,7 @@
                     <td class="collapsing">
                         @foreach (var tag in tags)
                         {
-                            <div class="ui compact basic icon button" @onclick="@(e => AddTagToHost(tag, host))">
+                            <div class="ui compact basic icon inverted button" @onclick="@(e => AddTagToHost(tag, host))">
                                 <i class="@tag.Icon icon"></i>
                             </div>
                         }
@@ -70,10 +61,10 @@
                     </td>
 
                     <td class="right aligned collapsing">
-                        <div class="ui compact disabled icon button">
+                        <div class="ui compact disabled icon inverted button">
                             <i class="info icon"></i>
                         </div>
-                        <div class="ui compact disabled icon button">
+                        <div class="ui compact disabled icon inverted button">
                             <i class="desktop icon"></i>
                         </div>
                     </td>
@@ -81,6 +72,10 @@
             }
         </tbody>
     </table>
+
+</div>
+
+<div class="inverted background">
 
 </div>
 
