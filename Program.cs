@@ -60,7 +60,7 @@ namespace ObservingThingy
                 new Tag { Name = "online",    Color = TagColor.green },
                 new Tag { Name = "offline",   Color = TagColor.red },
 
-                new Tag { Name = "step",      Color = TagColor.black, IsVisible = true , Icon = "step forward"},
+                new Tag { Name = "step",      Color = TagColor.grey, IsVisible = true , Icon = "step forward"},
                 new Tag { Name = "prepare",   Color = TagColor.yellow },
                 new Tag { Name = "restart",   Color = TagColor.orange },
                 new Tag { Name = "complete",  Color = TagColor.teal },
