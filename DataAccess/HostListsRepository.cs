@@ -80,12 +80,15 @@ namespace ObservingThingy.DataAccess
                 var link = new HostListToHost
                 {
                     Host = host,
-                    HostList = hostlist
+                    HostList = hostlist,
+                    SortNumber = int.MaxValue
                 };
                 hostlist.HostListToHosts.Add(link);
                 context.HostLists.Update(hostlist);
                 await context.SaveChangesAsync();
             }
+
+            await EnsureHostOrder(hostlist.Id);
         }
         internal async Task RemoveHostFromHostList(Host host, HostList hostlist)
         {
@@ -96,6 +99,8 @@ namespace ObservingThingy.DataAccess
                     .Remove(link);
                 await context.SaveChangesAsync();
             }
+
+            await EnsureHostOrder(hostlist.Id);
         }
 
         internal async Task MoveHostDown(int hostid, int hostlistid)
