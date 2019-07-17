@@ -38,8 +38,13 @@ namespace ObservingThingy.Services
                     using (var scope = _provider.CreateScope())
                     {
                         var repo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
+                        var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
 
                         await repo.Vacuum();
+
+                        var states = staterepo.GetAll()
+                            .Where(x => x.Timestamp < DateTimeOffset.Now - TimeSpan.FromHours(4));
+                        staterepo.Delete(states);
                     }
                 }
                 catch (Exception ex)

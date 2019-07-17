@@ -26,6 +26,12 @@ namespace ObservingThingy.DataAccess
             _hoststates.AddRange(newstates);
         }
 
+        internal List<HostState> GetAll()
+        {
+            return _hoststates
+                .ToList();
+        }
+
         internal List<HostState> GetForHost(int hostid, int count = 10)
         {
             return _hoststates
