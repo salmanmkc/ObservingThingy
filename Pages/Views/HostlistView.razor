@@ -53,7 +53,7 @@
 
                     <td class="right aligned collapsing">
                         <div class="pingsegments">
-                            @foreach (var state in @_staterepo.GetForHost(@host.Id, 10))
+                            @foreach (var state in @_staterepo.GetForHost(@host.Id, 16))
                             {
                                 <div class="pingsegment @state.Status" title="@state"></div>
                             }
