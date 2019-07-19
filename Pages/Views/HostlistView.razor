@@ -14,64 +14,61 @@
 @inject TagsRepository _tagsrepo
 @inject EventRepository _eventrepo
 
-<div class="ui fluid basic segment inverted container">
+<div class="ui fluid basic inverted container">
 
     <!-- <h1>Hosts</h1> -->
+    <div id="table" class="ui basic inverted segment">
+        @foreach (var host in hosts)
+        {
+            <!-- row start -->
+            <div class="primary-actions">
+                @foreach (var tag in tags)
+                {
+                    <div class="ui compact basic icon inverted button" @onclick="@(e => AddTagToHost(tag, host))">
+                        <i class="@tag.Icon icon"></i>
+                    </div>
+                }
+            </div>
 
-    <table class="ui single line very basic very compact unstackable inverted table">
-        <tbody>
-            @foreach (var host in hosts)
-            {
-                <tr>
-                    <td class="collapsing">
-                        @foreach (var tag in tags)
-                        {
-                            <div class="ui compact basic icon inverted button" @onclick="@(e => AddTagToHost(tag, host))">
-                                <i class="@tag.Icon icon"></i>
-                            </div>
-                        }
-                    </td>
+            <div class="name">
+                <h2 class="ui inverted sub header">
+                    @host.Name
+                </h2>
+                <span>
+                    @host.Hostname
+                </span>
+            </div>
 
-                    <td class="collapsing">
-                        <h2 class="ui sub header">
-                            @host.Name
-                        </h2>
-                        <span>
-                            @host.Hostname
-                        </span>
-                    </td>
+            <div class="tags">
+                @foreach (var link in host.TagToHosts)
+                {
+                    <div class="ui @link.Tag.Color label">
+                        @link.Tag.Name
+                        <i class="delete icon" @onclick="@(e => RemoveTagFromHost(link.Tag, host))"></i>
+                    </div>
+                }
+            </div>
 
-                    <td>
-                        @foreach (var link in host.TagToHosts)
-                        {
-                            <div class="ui @link.Tag.Color label">
-                                @link.Tag.Name
-                                <i class="delete icon" @onclick="@(e => RemoveTagFromHost(link.Tag, host))"></i>
-                            </div>
-                        }
-                    </td>
+            <div class="states">
+                <div class="pingsegments">
+                    @foreach (var state in @_staterepo.GetForHost(@host.Id, 16))
+                    {
+                        <div class="pingsegment @state.Status" title="@state"></div>
+                    }
+                </div>
+            </div>
 
-                    <td class="right aligned collapsing">
-                        <div class="pingsegments">
-                            @foreach (var state in @_staterepo.GetForHost(@host.Id, 16))
-                            {
-                                <div class="pingsegment @state.Status" title="@state"></div>
-                            }
-                        </div>
-                    </td>
-
-                    <td class="right aligned collapsing">
-                        <!-- <div class="ui compact disabled icon inverted button">
-                            <i class="info icon"></i>
-                        </div> -->
-                        <a class="ui compact icon inverted button" href="observingconnect:@host.Hostname">
-                            <i class="desktop icon"></i>
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+            <div class="secondary-actions">
+                <!-- <div class="ui compact disabled icon inverted button">
+                    <i class="info icon"></i>
+                </div> -->
+                <a class="ui compact icon inverted button" href="observingconnect:@host.Hostname">
+                    <i class="desktop icon"></i>
+                </a>
+            </div>
+            <!-- row end -->
+        }
+    </div>
 
 </div>
 

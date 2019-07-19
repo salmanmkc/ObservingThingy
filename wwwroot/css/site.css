@@ -69,3 +69,18 @@ app>.ui.container {
         margin-right: 0em !important;
     }
 }
+
+#table {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto auto;
+    grid-row-gap: 10px;
+    grid-column-gap: 6px;
+    align-items: center;
+    padding: 6px;
+}
+  
+#table > div {
+    align-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+}
