@@ -34,20 +34,20 @@
                     <td class="right aligned">
                         @if(@tag.IsValid)
                         {
-                            <div class="ui button" @onclick="@(e => ToggleActiveState(@tag))">Disable</div>
+                            <div class="ui button" @onclick="@(e => ToggleActiveState(tag))">Disable</div>
                         }
                         else
                         {
-                            <div class="ui button" @onclick="@(e => ToggleActiveState(@tag))">Enable</div>
+                            <div class="ui button" @onclick="@(e => ToggleActiveState(tag))">Enable</div>
                         }
-                        <div class="ui negative button" @onclick="@(e => DeleteTag(@tag))">Delete</div>
+                        <div class="ui negative button" @onclick="@(e => DeleteTag(tag))">Delete</div>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <EditForm class="ui form" Model="@_data" OnValidSubmit="@AddNewTag">
+    <EditForm class="ui form" Model="_data" OnValidSubmit="AddNewTag">
 
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -56,7 +56,7 @@
 
             <div class="field">
                 <label for="">Name</label>
-                <input type="text" @bind="@_data.Name" />
+                <input type="text" @bind="_data.Name" />
             </div>
 
         </div>

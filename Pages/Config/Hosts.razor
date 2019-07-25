@@ -32,20 +32,20 @@
                         <div class="ui disabled button">Edit</div>
                         @if(@host.IsValid)
                         {
-                            <div class="ui button" @onclick="@(e => ToggleActiveState(@host))">Disable</div>
+                            <div class="ui button" @onclick="@(e => ToggleActiveState(host))">Disable</div>
                         }
                         else
                         {
-                            <div class="ui button" @onclick="@(e => ToggleActiveState(@host))">Enable</div>
+                            <div class="ui button" @onclick="@(e => ToggleActiveState(host))">Enable</div>
                         }
-                        <div class="ui negative button" @onclick="@(e => DeleteHost(@host))">Delete</div>
+                        <div class="ui negative button" @onclick="@(e => DeleteHost(host))">Delete</div>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <EditForm class="ui form" Model="@_data" OnValidSubmit="@AddNewHost">
+    <EditForm class="ui form" Model="_data" OnValidSubmit="AddNewHost">
 
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -54,7 +54,7 @@
 
             <div class="field">
                 <label for="">Hostname</label>
-                <textarea @bind="@_data.Hostname" cols="20" rows="6"></textarea>
+                <textarea @bind="_data.Hostname" cols="20" rows="6"></textarea>
             </div>
 
         </div>

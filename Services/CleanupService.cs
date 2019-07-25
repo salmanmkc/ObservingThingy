@@ -35,17 +35,16 @@ namespace ObservingThingy.Services
 
                 try
                 {
-                    using (var scope = _provider.CreateScope())
-                    {
-                        var repo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
-                        var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
+                    using var scope = _provider.CreateScope();
 
-                        await repo.Vacuum();
+                    var repo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
+                    var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
 
-                        var states = staterepo.GetAll()
-                            .Where(x => x.Timestamp < DateTimeOffset.Now - TimeSpan.FromHours(4));
-                        staterepo.Delete(states);
-                    }
+                    await repo.Vacuum();
+
+                    var states = staterepo.GetAll()
+                        .Where(x => x.Timestamp < DateTimeOffset.Now - TimeSpan.FromHours(4));
+                    staterepo.Delete(states);
                 }
                 catch (Exception ex)
                 {

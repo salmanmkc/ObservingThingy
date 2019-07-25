@@ -18,25 +18,21 @@ namespace ObservingThingy
         public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
 
-            using (var scope = host.Services.CreateScope())
+            try
             {
-                var services = scope.ServiceProvider;
+                using var context = services.GetRequiredService<ApplicationDbContext>();
 
-                try
-                {
-                    using (var context = services.GetRequiredService<ApplicationDbContext>())
-                    {
-                        await context.Database.EnsureCreatedAsync();
+                await context.Database.EnsureCreatedAsync();
 
-                        await SeedDatabase(context);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while initializing the database.");
-                }
+                await SeedDatabase(context);
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while initializing the database.");
             }
 
             await host.RunAsync();

@@ -20,43 +20,42 @@ namespace ObservingThingy.DataAccess
 
         internal async Task Enqueue(ApplicationEvent appevent)
         {
-            using (var context = _factory())
-            {
-                await context.ApplicationEvents.AddAsync(appevent);
-                await context.SaveChangesAsync();
-            }
+            using var context = _factory();
+
+            await context.ApplicationEvents.AddAsync(appevent);
+            await context.SaveChangesAsync();
         }
 
         internal async Task<ApplicationEvent> Dequeue()
         {
-            using (var context = _factory())
+            using var context = _factory();
+
+            var evt = await context.ApplicationEvents.FirstAsync();
+
+            switch (evt)
             {
-                var evt = await context.ApplicationEvents.FirstAsync();
+                case TagEvent e:
+                    await context.Entry(e).Reference(x => x.Host).LoadAsync();
+                    await context.Entry(e).Reference(x => x.Tag).LoadAsync();
+                    break;
 
-                switch (evt)
-                {
-                    case TagEvent e:
-                        await context.Entry(e).Reference(x => x.Host).LoadAsync();
-                        await context.Entry(e).Reference(x => x.Tag).LoadAsync();
-                        break;
-
-                    case HostEvent e:
-                        await context.Entry(e).Reference(x => x.Host).LoadAsync();
-                        break;
-                }
-                
-                context.Remove(evt);
-                await context.SaveChangesAsync();
-                return evt;
+                case HostEvent e:
+                    await context.Entry(e).Reference(x => x.Host).LoadAsync();
+                    break;
             }
+
+            context.Remove(evt);
+            await context.SaveChangesAsync();
+            return evt;
         }
 
         internal bool HasElements
         {
             get
             {
-                using (var context = _factory())
-                    return context.ApplicationEvents.Count() > 0;
+                using var context = _factory();
+
+                return context.ApplicationEvents.Count() > 0;
             }
         }
     }

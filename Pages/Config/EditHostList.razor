@@ -30,10 +30,10 @@
                     <td>@host.Hostname</td>
                     <td class="right aligned">
                         <div class="ui icon buttons">
-                            <div class="ui button" @onclick="@(e => MoveHostUp(@host))"><i class="chevron down icon"></i></div>
-                            <div class="ui button" @onclick="@(e => MoveHostDown(@host))"><i class="chevron up icon"></i></div>
+                            <div class="ui button" @onclick="@(e => MoveHostUp(host))"><i class="chevron down icon"></i></div>
+                            <div class="ui button" @onclick="@(e => MoveHostDown(host))"><i class="chevron up icon"></i></div>
                         </div>
-                        <div class="ui negative button" @onclick="@(e => RemoveHostFromHostList(@host))">Remove</div>
+                        <div class="ui negative button" @onclick="@(e => RemoveHostFromHostList(host))">Remove</div>
                     </td>
                 </tr>
             }
@@ -46,7 +46,7 @@
 
         <div class="menu">
             @foreach (var host in allhosts){
-                <div class="item" @onclick="@(e => AddHostToHostList(@host))">@host.Hostname</div>
+                <div class="item" @onclick="@(e => AddHostToHostList(host))">@host.Hostname</div>
             }
         </div>
 

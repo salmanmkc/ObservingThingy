@@ -34,16 +34,14 @@ namespace ObservingThingy.Services
 
                 try
                 {
-                    using (var scope = _provider.CreateScope())
-                    {
-                        var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
-                        var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
-                        var eventrepo = scope.ServiceProvider.GetRequiredService<EventRepository>();
+                    using var scope = _provider.CreateScope();
+                    var hostsrepo = scope.ServiceProvider.GetRequiredService<HostsRepository>();
+                    var staterepo = scope.ServiceProvider.GetRequiredService<HostStatesRepository>();
+                    var eventrepo = scope.ServiceProvider.GetRequiredService<EventRepository>();
 
-                        await CreateStateEntries(hostsrepo, staterepo);
+                    await CreateStateEntries(hostsrepo, staterepo);
 
-                        await UpdateLastStateEntry(hostsrepo, staterepo, eventrepo, stoppingToken);
-                    }
+                    await UpdateLastStateEntry(hostsrepo, staterepo, eventrepo, stoppingToken);
                 }
                 catch (Exception ex)
                 {
