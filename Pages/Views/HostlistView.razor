@@ -5,6 +5,7 @@
 @using System.ComponentModel.DataAnnotations
 @using ObservingThingy.Data
 @using ObservingThingy.DataAccess
+@using Microsoft.Extensions.Logging
 
 @implements IDisposable
 
@@ -13,6 +14,7 @@
 @inject HostListsRepository _hostlistsrepo
 @inject TagsRepository _tagsrepo
 @inject EventRepository _eventrepo
+@inject ILoggerFactory _loggerfactory
 
 <div class="ui fluid basic inverted container">
 
@@ -71,8 +73,9 @@
                 else
                 {
                     <a class="ui compact icon inverted button" @onclick="@(e => SetActiveHostId(host))" href="observingconnect:@host.Hostname">
-                    <i class="desktop icon"></i>
-                </a>
+                        <i class="desktop icon"></i>
+                    </a>
+                }
             </div>
             <!-- row end -->
         }
@@ -89,6 +92,8 @@
     [Parameter]
     private int id { get; set; }
 
+    private ILogger<HostlistView> _logger; 
+
     List<Host> hosts { get; set; }
 
     List<Tag> tags { get; set; }
@@ -102,6 +107,8 @@
         await RefreshHosts();
         tags = await _tagsrepo.GetAllVisible();
         
+        _logger = _loggerfactory.CreateLogger<HostlistView>();
+
         RefreshLoop();
     }
 
@@ -112,6 +119,8 @@
 
     private async Task RefreshLoop()
     {
+        _logger.LogInformation("HostlistView has been opened");
+
         while (active)
         {
             await Task.Delay(3000); // 3 seconds
@@ -119,6 +128,7 @@
             StateHasChanged();
         }
 
+        _logger.LogInformation("HostlistView has been disposed");
     }
 
     private void SetActiveHostId(Host host)
