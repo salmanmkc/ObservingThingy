@@ -62,7 +62,15 @@
                 <!-- <div class="ui compact disabled icon inverted button">
                     <i class="info icon"></i>
                 </div> -->
-                <a class="ui compact icon inverted button" href="observingconnect:@host.Hostname">
+                @if (host.Id == activehostid)
+                {
+                    <a class="ui compact icon green button" href="observingconnect:@host.Hostname">
+                        <i class="desktop icon"></i>
+                    </a>
+                }
+                else
+                {
+                    <a class="ui compact icon inverted button" @onclick="@(e => SetActiveHostId(host))" href="observingconnect:@host.Hostname">
                     <i class="desktop icon"></i>
                 </a>
             </div>
@@ -87,6 +95,8 @@
 
     private bool active = true;
 
+    private int activehostid = 0;
+
     protected override async Task OnInitAsync()
     {
         await RefreshHosts();
@@ -108,6 +118,12 @@
             await RefreshHosts();
             StateHasChanged();
         }
+
+    }
+
+    private void SetActiveHostId(Host host)
+    {
+        activehostid = host.Id;
     }
 
     private async Task RefreshHosts()
