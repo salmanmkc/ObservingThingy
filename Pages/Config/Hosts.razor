@@ -83,7 +83,8 @@
                 .GetLines()
                 .Select(x => new Host { Hostname = x.Trim() });
 
-            await _hostsrepo.Create(newhosts);
+            foreach (var newhost in newhosts)
+                await _hostsrepo.Create(newhost);
 
             _data = new NewHostDataModel();
             await OnInitAsync();

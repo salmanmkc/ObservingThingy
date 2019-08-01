@@ -77,10 +77,14 @@ namespace ObservingThingy.DataAccess
 
         internal async Task Create(Host host)
         {
-            using var context = _factory();
+            try
+            {
+                using var context = _factory();
 
-            await context.Hosts.AddAsync(host);
-            await context.SaveChangesAsync();
+                await context.Hosts.AddAsync(host);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception) { }
         }
 
         internal async Task Create(IEnumerable<Host> hosts)
