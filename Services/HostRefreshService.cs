@@ -61,9 +61,10 @@ namespace ObservingThingy.Services
         {
             var hosts = await hostsrepo.GetAllActive();
 
-            var checks = hosts.Select(x => UpdateSingleHostStateEntry(hostsrepo, staterepo, eventrepo, x));
-
-            await Task.WhenAll(checks);
+            await hosts.ForEachAsync(10, async (host) =>
+            {
+                await UpdateSingleHostStateEntry(hostsrepo, staterepo, eventrepo, host);
+            });
         }
 
         private async Task UpdateSingleHostStateEntry(HostsRepository hostsrepo, HostStatesRepository staterepo, EventRepository eventrepo, Data.Host host)
