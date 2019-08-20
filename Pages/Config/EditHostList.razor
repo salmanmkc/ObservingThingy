@@ -64,7 +64,7 @@
     List<Host> allhosts { get; set; }
 
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         hostlist = await _hostlistsrepo.Get(id);
         hosts = await _hostlistsrepo.GetHosts(id);
@@ -77,7 +77,7 @@
         {
             await _hostlistsrepo.AddHostToHostList(host, hostlist);
         } catch (Exception) { }
-        await OnInitAsync();
+        await OnInitializedAsync();
     }
 
     async Task RemoveHostFromHostList(Host host)
@@ -86,7 +86,7 @@
         {
             await _hostlistsrepo.RemoveHostFromHostList(host, hostlist);
         } catch (Exception) { }
-        await OnInitAsync();
+        await OnInitializedAsync();
     }
 
     async Task MoveHostUp(Host host)
@@ -95,7 +95,7 @@
         {
             await _hostlistsrepo.MoveHostUp(host.Id, hostlist.Id);
         } catch (Exception) { }
-        await OnInitAsync();
+        await OnInitializedAsync();
     }
 
     async Task MoveHostDown(Host host)
@@ -104,6 +104,6 @@
         {
             await _hostlistsrepo.MoveHostDown(host.Id, hostlist.Id);
         } catch (Exception) { }
-        await OnInitAsync();
+        await OnInitializedAsync();
     }
 }
